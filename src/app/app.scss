@@ -1,0 +1,62 @@
+/* Header + hamburger menu styles + avatar/login */
+.app-header{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	gap:1rem;
+	padding:.5rem 1rem;
+	position:relative;
+	z-index:60;
+	background:transparent;
+}
+.header-left{display:flex;align-items:center;gap:.75rem}
+.app-title{margin:0;font-size:1.15rem;font-weight:700}
+
+.header-right{margin-left:auto;display:flex;align-items:center;position:relative;gap:0.75rem}
+
+.nav-toggle{display:none}
+
+.hamburger{display:inline-flex;flex-direction:column;justify-content:space-between;width:44px;height:30px;cursor:pointer;padding:6px;border-radius:8px}
+.hamburger span{display:block;height:3px;background:var(--hamburger-color,#072033);border-radius:3px;transition:all .2s}
+
+.nav-menu{
+	position:absolute;
+	right:0;
+	top:calc(100% + 10px);
+	background:#ffffffef;
+	backdrop-filter: blur(6px);
+	box-shadow:0 10px 30px rgba(0,0,0,0.12);
+	border-radius:10px;
+	padding:.5rem .5rem;
+	display:flex;
+	flex-direction:column;
+	gap:.25rem;
+	min-width:160px;
+	opacity:0;
+	transform:translateY(-6px) scale(.98);
+	pointer-events:none;
+	transition:opacity .18s ease, transform .18s ease;
+}
+.nav-menu a{padding:.5rem .75rem;color:#072033;text-decoration:none;border-radius:8px;font-weight:600}
+.nav-menu a:hover{background:rgba(7,32,51,0.06)}
+
+/* when toggled */
+.nav-toggle:checked + .hamburger span:nth-child(1){transform:translateY(9px) rotate(45deg)}
+.nav-toggle:checked + .hamburger span:nth-child(2){opacity:0}
+.nav-toggle:checked + .hamburger span:nth-child(3){transform:translateY(-9px) rotate(-45deg)}
+.nav-toggle:checked + .hamburger + .nav-menu{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+
+/* header actions: avatar + login button */
+.header-actions{display:flex;align-items:center;gap:.6rem;margin-left:.5rem}
+.header-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,0,0,0.06);box-shadow:0 6px 18px rgba(2,8,23,0.18)}
+.header-login{--p-button-bg: linear-gradient(90deg,#ffb86b,#ff7a7a);height:38px;padding:0 12px;display:inline-flex;align-items:center}
+
+@media (max-width:520px){
+	.app-title{display:none}
+	.nav-menu{min-width:220px;right:8px}
+	.header-avatar{width:36px;height:36px}
+}
+
+.hm{
+    background-color: white !important;
+}
