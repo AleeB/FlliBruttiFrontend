@@ -1,0 +1,81 @@
+<section class="movimento-container">
+    
+    <div class="movimento-header">
+        <h2>Richiesta Movimento Terra</h2>
+        <p>Compila il modulo per richiedere un intervento</p>
+    </div>
+
+    <div class="movimento-form-wrapper">
+        <form [formGroup]="nccForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+                <!-- Nome e Cognome -->
+                <div class="form-group">
+                    <label for="nomeCognome">Nome e Cognome</label>
+                    <input
+                        pInputText
+                        id="nomeCognome"
+                        formControlName="nomeCognome"
+                        placeholder="Inserisci nome e cognome"
+                        class="w-full" />
+                </div>
+
+                <!-- Mail -->
+                <div class="form-group">
+                    <label for="mail">Mail</label>
+                    <input
+                        pInputText
+                        id="mail"
+                        type="email"
+                        formControlName="mail"
+                        placeholder="esempio@dominio.it"
+                        class="w-full" />
+                </div>
+
+                <!-- Periodo (data) -->
+                <div class="form-group">
+                    <label for="periodo">Periodo</label>
+                    <p-calendar
+                        id="periodo"
+                        formControlName="periodo"
+                        dateFormat="dd/mm/yy"
+                        showIcon="true"
+                        placeholder="Seleziona data"
+                        class="w-full">
+                    </p-calendar>
+                </div>
+
+                <!-- Richiesta dettagliata -->
+                <div class="form-group-full">
+                    <label for="dettagli">Richiesta dettagliata</label>
+                    <p-inputTextarea
+                        id="dettagli"
+                        formControlName="dettagli"
+                        rows="6"
+                        autoResize="true"
+                        placeholder="Descrivi la richiesta con dettagli (es. quantità di materiale, mezzi richiesti, accessibilità, tempistiche, ecc.)"
+                        class="w-full">
+                    </p-inputTextarea>
+                </div>
+            </div>
+
+            <!-- Azioni -->
+            <div class="form-actions">
+                <button
+                    pButton
+                    type="submit"
+                    label="Invia Richiesta"
+                    class="p-button"
+                    [disabled]="!nccForm.valid">
+                </button>
+
+                <button
+                    pButton
+                    type="button"
+                    label="Annulla"
+                    class="p-button-outlined"
+                    routerLink="/preventivi">
+                </button>
+            </div>
+        </form>
+    </div>
+</section>

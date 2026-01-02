@@ -1,8 +1,5 @@
-.p-button-outlined{
-    color: rgba(0, 0, 0);
-}
-
-.ncc-container {
+// filepath: c:\Users\polen\Desktop\Università\appCloud\FlliBruttiFrontend\src\app\pages\preventivi\movimentoTerra\movimentoTerra.component.scss
+.movimento-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
@@ -12,7 +9,8 @@
     justify-content: center;
 }
 
-.ncc-header {
+
+.movimento-header {
     text-align: center;
     margin-bottom: 3rem;
 
@@ -30,7 +28,7 @@
     }
 }
 
-.ncc-form-wrapper {
+.movimento-form-wrapper {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -61,28 +59,25 @@
     }
 
     input,
-    ::ng-deep .p-inputnumber {
+    ::ng-deep .p-calendar,
+    ::ng-deep .p-inputtextarea {
         width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 10px;
     }
 }
 
 .form-group-full {
     width: 100%;
-}
-
-.ztl-checkbox {
-    color: #1a1a1a;
     display: flex;
-    align-items: center;
-
-    ::ng-deep .p-checkbox {
-        margin-right: 0.75rem;
-    }
+    flex-direction: column;
+    gap: 0.5rem;
 
     label {
         font-size: 0.9375rem;
+        font-weight: 600;
         color: #1a1a1a;
-        cursor: pointer;
     }
 }
 
@@ -100,11 +95,11 @@
 
 // Responsive
 @media (max-width: 768px) {
-    .ncc-container {
+    .movimento-container {
         padding: 1rem;
     }
 
-    .ncc-header {
+    .movimento-header {
         margin-bottom: 2rem;
 
         h2 {
@@ -112,7 +107,7 @@
         }
     }
 
-    .ncc-form-wrapper {
+    .movimento-form-wrapper {
         padding: 1.5rem;
     }
 
