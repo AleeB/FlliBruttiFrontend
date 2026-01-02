@@ -92,11 +92,14 @@
 .hero-buttons a.p-button-outlined{
     background:rgba(28, 65, 153, 0.5);
     border:2px solid rgba(255,255,255,0.2) !important;
-	color:rgba(255,255,255,0.92) !important;
+	color:rgba(255,255,255,0.92);
 	backdrop-filter: blur(6px);
 }
 
-.hero-buttons a:hover{transform:translateY(-4px);opacity:0.98}
+
+.hero-buttons a:hover{transform:translateY(-4px);opacity:0.98;
+		color: rgb(133, 230, 194) !important;
+}
 
 /* small screens */
 @media (max-width:900px){
