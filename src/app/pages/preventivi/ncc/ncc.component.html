@@ -1,0 +1,91 @@
+<!-- filepath: src/app/pages/preventivi/ncc/ncc.component.html -->
+<section class="ncc-container">
+    <div class="ncc-header">
+        <h2>Noleggio con Conducente</h2>
+        <p>Richiedi un preventivo personalizzato</p>
+    </div>
+
+    <div class="ncc-form-wrapper">
+        <form [formGroup]="nccForm" (ngSubmit)="onSubmit()">
+            
+            <div class="form-grid">
+                <!-- Città di Partenza -->
+                <div class="form-group">
+                    <label for="cittaPartenza">Città di Partenza</label>
+                    <input 
+                        pInputText 
+                        id="cittaPartenza" 
+                        formControlName="cittaPartenza"
+                        placeholder="Inserisci città di partenza"
+                        class="w-full" />
+                </div>
+
+                <!-- Città d'Arrivo -->
+                <div class="form-group">
+                    <label for="cittaArrivo">Città d'Arrivo</label>
+                    <input 
+                        pInputText 
+                        id="cittaArrivo" 
+                        formControlName="cittaArrivo"
+                        placeholder="Inserisci città d'arrivo"
+                        class="w-full" />
+                </div>
+
+                <!-- Giorni di Permanenza -->
+                <div class="form-group">
+                    <label for="giorniPermanenza">Giorni di Permanenza</label>
+                    <p-inputNumber 
+                        id="giorniPermanenza" 
+                        formControlName="giorniPermanenza"
+                        [min]="1"
+                        placeholder="Numero giorni"
+                        class="w-full">
+                    </p-inputNumber>
+                </div>
+
+                <!-- Numero di Persone -->
+                <div class="form-group">
+                    <label for="numeroPersone">Numero di Persone</label>
+                    <p-inputNumber 
+                        id="numeroPersone" 
+                        formControlName="numeroPersone"
+                        [min]="5"
+                        [max]="100"
+                        placeholder="Numero persone"
+                        class="w-full">
+                    </p-inputNumber>
+                </div>
+            </div>
+
+            <!-- ZTL Checkbox -->
+            <div class="form-group-full">
+                <div class="ztl-checkbox">
+                    <p-checkbox 
+                        formControlName="ztl"
+                        label="Accesso a zone a traffico limitato (ZTL)"
+                        [binary]="true">
+                    </p-checkbox>
+                    Seleziona se il percorso include zone a traffico limitato.
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-actions">
+                <button 
+                    pButton 
+                    type="submit" 
+                    label="Richiedi Preventivo"
+                    class="p-button"
+                    [disabled]="!nccForm.valid">
+                </button>
+                <button 
+                    pButton 
+                    type="button" 
+                    label="Annulla"
+                    routerLink="/preventivi"
+                    class="p-button-outlined">
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
