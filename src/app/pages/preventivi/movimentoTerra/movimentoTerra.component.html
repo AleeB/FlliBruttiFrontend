@@ -40,40 +40,40 @@
                         dateFormat="dd/mm/yy"
                         showIcon="true"
                         placeholder="Seleziona data"
-                        class="w-full">
+                        class="max-w-full">
                     </p-calendar>
                 </div>
 
                 <!-- Richiesta dettagliata -->
                 <div class="form-group-full">
                     <label for="dettagli">Richiesta dettagliata</label>
-                    <p-inputTextarea
+                    <textarea 
+                        rows="5"
+                        cols="30" 
+                        pTextarea [autoResize]="true"
                         id="dettagli"
                         formControlName="dettagli"
-                        rows="6"
-                        autoResize="true"
-                        placeholder="Descrivi la richiesta con dettagli (es. quantità di materiale, mezzi richiesti, accessibilità, tempistiche, ecc.)"
-                        class="w-full">
-                    </p-inputTextarea>
+                        placeholder="Descrivi nel dettaglio la tua richiesta">
+                    </textarea>
                 </div>
             </div>
 
             <!-- Azioni -->
             <div class="form-actions">
-                <button
-                    pButton
-                    type="submit"
+                <button 
+                    pButton 
+                    type="button" 
+                    label="Indietro"
+                    routerLink="/preventivi"
+                    class="p-button-outlined">
+                    <i class="pi pi-arrow-left" style="color: #000000"></i>
+                </button>
+                <button 
+                    pButton 
+                    type="submit" 
                     label="Invia Richiesta"
                     class="p-button"
                     [disabled]="!nccForm.valid">
-                </button>
-
-                <button
-                    pButton
-                    type="button"
-                    label="Annulla"
-                    class="p-button-outlined"
-                    routerLink="/preventivi">
                 </button>
             </div>
         </form>

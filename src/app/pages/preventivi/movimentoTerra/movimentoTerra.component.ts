@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -8,11 +7,13 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TextareaModule } from 'primeng/textarea';
+// import { CalendarModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-ncc',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule],
+  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule, CalendarModule],
   templateUrl: './movimentoTerra.component.html',
   styleUrls: ['./movimentoTerra.component.scss']
 })
@@ -21,11 +22,10 @@ export class MovimentoTerraComponent {
 
   constructor(private fb: FormBuilder) {
     this.nccForm = this.fb.group({
-      cittaPartenza: ['', Validators.required],
-      cittaArrivo: ['', Validators.required],
-      giorniPermanenza: [1, [Validators.required, Validators.min(1)]],
-      numeroPersone: [1, [Validators.required, Validators.min(1), Validators.max(8)]],
-      ztl: [false]
+      nomeCognome: ['', Validators.required],
+      mail: ['', [Validators.required, Validators.email]],
+      periodo: [null, Validators.required],
+      dettagli: ['']
     });
   }
 

@@ -47,6 +47,14 @@
     gap: 1.5rem;
 }
 
+.pi .pi-arrow-left{
+    color: rgb(0, 0, 0);
+}
+
+.pi .pi-arrow-left:hover{
+    color: rgb(133, 230, 194);
+}
+
 .form-group {
     display: flex;
     flex-direction: column;

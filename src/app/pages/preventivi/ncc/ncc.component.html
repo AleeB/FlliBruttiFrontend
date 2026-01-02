@@ -65,7 +65,7 @@
                         label="Accesso a zone a traffico limitato (ZTL)"
                         [binary]="true">
                     </p-checkbox>
-                    Seleziona se il percorso include zone a traffico limitato.
+                    <span>Seleziona se il percorso include <strong> zone a traffico limitato</strong>.</span>
                 </div>
             </div>
 
@@ -73,17 +73,18 @@
             <div class="form-actions">
                 <button 
                     pButton 
-                    type="submit" 
-                    label="Richiedi Preventivo"
-                    class="p-button"
-                    [disabled]="!nccForm.valid">
-                </button>
-                <button 
-                    pButton 
                     type="button" 
                     label="Indietro"
                     routerLink="/preventivi"
                     class="p-button-outlined">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <button 
+                    pButton 
+                    type="submit" 
+                    label="Richiedi Preventivo"
+                    class="p-button"
+                    [disabled]="!nccForm.valid">
                 </button>
             </div>
         </form>
