@@ -23,9 +23,6 @@ export class NccComponent {
     this.nccForm = this.fb.group({
       cittaPartenza: ['', Validators.required],
       cittaArrivo: ['', Validators.required],
-      giorniPermanenza: [1, [Validators.required, Validators.min(1)]],
-      numeroPersone: [1, [Validators.required, Validators.min(1), Validators.max(8)]],
-      ztl: [false]
     });
   }
 

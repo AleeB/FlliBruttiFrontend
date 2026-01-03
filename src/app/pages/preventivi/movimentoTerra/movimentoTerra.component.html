@@ -4,9 +4,12 @@
         <h2>Richiesta Movimento Terra</h2>
         <p>Compila il modulo per richiedere un intervento</p>
     </div>
+    <!-- 
+    MOVIMENTO TERRA 
+- AGGIUNGI CARICAMENTO FOTO (MAX. 20 MEGA) -->
 
     <div class="movimento-form-wrapper">
-        <form [formGroup]="nccForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="MovimentoTerraForm" (ngSubmit)="onSubmit()">
             <div class="form-grid">
                 <!-- Nome e Cognome -->
                 <div class="form-group">
@@ -30,20 +33,16 @@
                         placeholder="esempio@dominio.it"
                         class="w-full" />
                 </div>
-
-                <!-- Periodo (data) -->
+                <!-- Numero di Telefono -->
                 <div class="form-group">
-                    <label for="periodo">Periodo</label>
-                    <p-calendar
-                        id="periodo"
-                        formControlName="periodo"
-                        dateFormat="dd/mm/yy"
-                        showIcon="true"
-                        placeholder="Seleziona data"
-                        class="max-w-full">
-                    </p-calendar>
+                    <label for="telefono">Numero di Telefono</label>
+                    <input 
+                        pInputText 
+                        id="telefono" 
+                        formControlName="telefono"
+                        placeholder="Inserisci numero di telefono"
+                        class="w-full" />
                 </div>
-
                 <!-- Richiesta dettagliata -->
                 <div class="form-group-full">
                     <label for="dettagli">Richiesta dettagliata</label>
@@ -73,7 +72,7 @@
                     type="submit" 
                     label="Invia Richiesta"
                     class="p-button"
-                    [disabled]="!nccForm.valid">
+                    [disabled]="!MovimentoTerraForm.valid">
                 </button>
             </div>
         </form>

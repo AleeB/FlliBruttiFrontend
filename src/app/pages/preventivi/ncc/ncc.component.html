@@ -1,4 +1,5 @@
 <!-- filepath: src/app/pages/preventivi/ncc/ncc.component.html -->
+<!-- DATE - CITTA + PULLMAN (QUANTITA' persone) - DATI PERSONALI  -->
 <section class="ncc-container">
     <div class="ncc-header">
         <h2>Noleggio con Conducente</h2>
@@ -29,47 +30,10 @@
                         formControlName="cittaArrivo"
                         placeholder="Inserisci città d'arrivo"
                         class="w-full" />
-                </div>
-
-                <!-- Giorni di Permanenza -->
-                <div class="form-group">
-                    <label for="giorniPermanenza">Giorni di Permanenza</label>
-                    <p-inputNumber 
-                        id="giorniPermanenza" 
-                        formControlName="giorniPermanenza"
-                        [min]="1"
-                        placeholder="Numero giorni"
-                        class="w-full">
-                    </p-inputNumber>
-                </div>
-
-                <!-- Numero di Persone -->
-                <div class="form-group">
-                    <label for="numeroPersone">Numero di Persone (min. 5)</label>
-                    <p-inputNumber 
-                        id="numeroPersone" 
-                        formControlName="numeroPersone"
-                        [min]="5"
-                        [max]="100"
-                        placeholder="Numero persone"
-                        class="w-full">
-                    </p-inputNumber>
-                </div>
             </div>
+        </div>
 
-            <!-- ZTL Checkbox -->
-            <div class="form-group-full">
-                <div class="ztl-checkbox">
-                    <p-checkbox 
-                        formControlName="ztl"
-                        label="Accesso a zone a traffico limitato (ZTL)"
-                        [binary]="true">
-                    </p-checkbox>
-                    <span>Seleziona se il percorso include <strong> zone a traffico limitato</strong>.</span>
-                </div>
-            </div>
-
-            <!-- Buttons -->
+        <!-- Buttons -->
             <div class="form-actions">
                 <button 
                     pButton 
@@ -82,7 +46,7 @@
                 <button 
                     pButton 
                     type="submit" 
-                    label="Richiedi Preventivo"
+                    label="Avanti 2/3"
                     class="p-button"
                     [disabled]="!nccForm.valid">
                 </button>
