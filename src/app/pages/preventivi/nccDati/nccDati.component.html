@@ -1,0 +1,92 @@
+<!-- filepath: src/app/pages/preventivi/ncc/ncc.component.html -->
+<!-- DATE - CITTA + PULLMAN (QUANTITA' persone) - DATI PERSONALI  -->
+<section class="ncc-container">
+    <div class="ncc-header">
+        <h2>Noleggio con Conducente</h2>
+        <p>Richiedi un preventivo personalizzato</p>
+    </div>
+
+    <div class="ncc-form-wrapper">
+        <form [formGroup]="nccForm" (ngSubmit)="onSubmit()">
+            
+            <div class="form-grid">
+                <!-- Nome -->
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input
+                        pInputText
+                        id="nome"
+                        formControlName="nome"
+                        placeholder="Inserisci nome"
+                        class="w-full" />
+                </div>
+                
+                <!-- Cognome -->
+                <div class="form-group">
+                    <label for="cognome">Cognome</label>
+                    <input
+                        pInputText
+                        id="cognome"
+                        formControlName="cognome"
+                        placeholder="Inserisci cognome"
+                        class="w-full" />
+                </div>
+
+                <!-- Mail -->
+                <div class="form-group">
+                    <label for="mail">Mail</label>
+                    <input
+                        pInputText
+                        id="mail"
+                        type="email"
+                        formControlName="mail"
+                        placeholder="esempio@dominio.it"
+                        class="w-full" />
+                </div>
+                <!-- Numero di Telefono -->
+                <div class="form-group">
+                    <label for="telefono">Numero di Telefono</label>
+                    <input 
+                        pInputText 
+                        id="telefono" 
+                        formControlName="telefono"
+                        placeholder="Inserisci numero di telefono"
+                        class="w-full" />
+                </div>
+            </div>
+
+            <!-- Dettagli extra -->
+                <div class="form-group-full">
+                    <label for="dettagli">Aggiungi informazioni extra</label>
+                    <textarea 
+                        rows="2"
+                        cols="20" 
+                        pTextarea [autoResize]="true"
+                        id="dettagli"
+                        formControlName="dettagli"
+                        placeholder="Descrivi nel dettaglio la tua richiesta">
+                    </textarea>
+                </div>
+
+        <!-- Buttons -->
+            <div class="form-actions">
+                <button 
+                    pButton 
+                    type="button" 
+                    label="Indietro"
+                    routerLink="/nccCity"
+                    class="p-button-outlined">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <button 
+                    pButton 
+                    type="submit" 
+                    label="Invia Preventivo"
+                    routerLink="/"
+                    class="p-button"
+                    [disabled]="!nccForm.valid">
+                </button>
+            </div>
+        </form>
+    </div>
+</section>

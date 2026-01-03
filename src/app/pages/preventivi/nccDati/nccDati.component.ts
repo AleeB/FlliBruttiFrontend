@@ -1,3 +1,4 @@
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -9,19 +10,21 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 
+
 @Component({
   selector: 'app-ncc',
   standalone: true,
   imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule],
-  templateUrl: './movimentoTerra.component.html',
-  styleUrls: ['./movimentoTerra.component.scss']
+  templateUrl: './nccDati.component.html',
+  styleUrls: ['./nccDati.component.scss']
 })
-export class MovimentoTerraComponent {
-  MovimentoTerraForm: FormGroup;
+export class NccDatiComponent {
+  nccForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
-    this.MovimentoTerraForm = this.fb.group({
-      nomeCognome: ['', Validators.required],
+    this.nccForm = this.fb.group({
+      nome: ['', Validators.required],
+      cognome: ['', Validators.required],
       mail: ['', [Validators.required, Validators.email]],
       telefono: ['', Validators.minLength(10)],
       dettagli: ['']
@@ -29,8 +32,8 @@ export class MovimentoTerraComponent {
   }
 
   onSubmit(): void {
-    if (this.MovimentoTerraForm.valid) {
-      console.log('MovimentoTerraForm', this.MovimentoTerraForm.value);
+    if (this.nccForm.valid) {
+      console.log('nccForm', this.nccForm.value);
     }
   }
 }
