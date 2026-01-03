@@ -10,8 +10,15 @@
     color: rgb(133, 230, 194);
 }
 
+span{
+    text-align: center;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
 .ncc-container {
-    max-width: 500px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
     min-height: 100vh;
@@ -52,20 +59,31 @@
 }
 
 .form-grid {
-    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
 
-    .dp{
-        margin: 0.5rem;
-
-    }
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 
     label {
         font-size: 0.9375rem;
         font-weight: 600;
         color: #1a1a1a;
     }
+
+    input,
+    ::ng-deep .p-inputnumber {
+        width: 100%;
+    }
 }
 
+.form-group-full {
+    width: 100%;
+}
 
 .form-actions {
     display: flex;

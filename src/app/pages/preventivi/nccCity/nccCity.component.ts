@@ -8,21 +8,21 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { DatePickerModule } from 'primeng/datepicker';
+
 @Component({
   selector: 'app-ncc',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, DatePickerModule],
-  templateUrl: './ncc.component.html',
-  styleUrls: ['./ncc.component.scss']
+  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule],
+  templateUrl: './nccCity.component.html',
+  styleUrls: ['./nccCity.component.scss']
 })
-export class NccComponent {
+export class NccCityComponent {
   nccForm: FormGroup;
 
-  rangeDates: Date[] | undefined;
   constructor(private fb: FormBuilder) {
     this.nccForm = this.fb.group({
-      period: [null, Validators.required]
+      cittaPartenza: ['', Validators.required],
+      cittaArrivo: ['', Validators.required],
     });
   }
 

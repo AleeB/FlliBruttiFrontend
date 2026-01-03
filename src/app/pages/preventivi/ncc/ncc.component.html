@@ -9,29 +9,17 @@
     <div class="ncc-form-wrapper">
         <form [formGroup]="nccForm" (ngSubmit)="onSubmit()">
             
+            <!-- Date Picker -->
             <div class="form-grid">
-                <!-- Città di Partenza -->
-                <div class="form-group">
-                    <label for="cittaPartenza">Città di Partenza</label>
-                    <input 
-                        pInputText 
-                        id="cittaPartenza" 
-                        formControlName="cittaPartenza"
-                        placeholder="Inserisci città di partenza"
-                        class="w-full" />
-                </div>
-
-                <!-- Città d'Arrivo -->
-                <div class="form-group">
-                    <label for="cittaArrivo">Città d'Arrivo</label>
-                    <input 
-                        pInputText 
-                        id="cittaArrivo" 
-                        formControlName="cittaArrivo"
-                        placeholder="Inserisci città d'arrivo"
-                        class="w-full" />
+                <label for="period">Seleziona il range per di Noleggio</label>
+                <br>
+                <p-datepicker
+                class="dp" 
+                formControlName="period"
+                selectionMode="range" 
+                [readonlyInput]="true" />
+                
             </div>
-        </div>
 
         <!-- Buttons -->
             <div class="form-actions">
@@ -46,7 +34,8 @@
                 <button 
                     pButton 
                     type="submit" 
-                    label="Avanti 2/3"
+                    label="Avanti 1/3"
+                    routerLink="/nccCity"
                     class="p-button"
                     [disabled]="!nccForm.valid">
                 </button>
