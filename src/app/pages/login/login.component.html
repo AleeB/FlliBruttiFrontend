@@ -3,8 +3,9 @@
 
   <h2>Accedi al sistema</h2>
   <form (ngSubmit)="login()">
-    <h3>Username<input name="username" [(ngModel)]="username" /></h3>
-    <h3>Password<input name="password" type="password" [(ngModel)]="password" /></h3><br>
+    <h3>Username<input [pAutoFocus]="true" name="username" [(ngModel)]="username" /></h3>
+    <h3>Password<input name="password" type="password" [(ngModel)]="password">
+    </h3><br>
     <button pButton type="submit" label="Login"></button>
   </form>
 </div>

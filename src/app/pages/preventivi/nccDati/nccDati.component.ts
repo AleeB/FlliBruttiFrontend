@@ -9,12 +9,13 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
+import { AutoFocus } from "primeng/autofocus";
 
 
 @Component({
   selector: 'app-ncc',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule],
+  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule, AutoFocus],
   templateUrl: './nccDati.component.html',
   styleUrls: ['./nccDati.component.scss']
 })

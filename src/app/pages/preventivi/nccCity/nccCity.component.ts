@@ -8,11 +8,13 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
+import { AutoFocusModule } from 'primeng/autofocus';
+
 
 @Component({
   selector: 'app-ncc',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule],
+  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, AutoFocusModule],
   templateUrl: './nccCity.component.html',
   styleUrls: ['./nccCity.component.scss']
 })
