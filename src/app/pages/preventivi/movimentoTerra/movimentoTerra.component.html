@@ -9,6 +9,7 @@
 - AGGIUNGI CARICAMENTO FOTO (MAX. 20 MEGA) -->
 
     <div class="movimento-form-wrapper">
+        <p-toast/>
         <form [formGroup]="MovimentoTerraForm" (ngSubmit)="onSubmit()">
             <div class="form-grid">
                 <!-- Nome e Cognome -->
@@ -72,7 +73,8 @@
                     type="submit" 
                     label="Invia Richiesta"
                     class="p-button"
-                    [disabled]="!MovimentoTerraForm.valid">
+                    [disabled]="!MovimentoTerraForm.valid"
+                    (onclick)="onSubmit()">
                 </button>
             </div>
         </form>

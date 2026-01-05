@@ -1,5 +1,4 @@
 <!-- filepath: src/app/pages/preventivi/ncc/ncc.component.html -->
-<!-- DATE - CITTA + PULLMAN (QUANTITA' persone) - DATI PERSONALI  -->
 <section class="ncc-container">
     <div class="ncc-header">
         <h2>Noleggio con Conducente</h2>
@@ -14,6 +13,7 @@
                 <label for="period">Seleziona il range per di Noleggio</label>
                 <br>
                 <p-datepicker
+                dateFormat="dd/mm/yy"
                 class="dp" 
                 formControlName="period"
                 selectionMode="range" 

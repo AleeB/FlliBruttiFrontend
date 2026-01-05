@@ -10,6 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { AutoFocus } from "primeng/autofocus";
+import { MessageService } from 'primeng/api';
 
 
 @Component({
@@ -17,12 +18,13 @@ import { AutoFocus } from "primeng/autofocus";
   standalone: true,
   imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule, AutoFocus],
   templateUrl: './nccDati.component.html',
-  styleUrls: ['./nccDati.component.scss']
+  styleUrls: ['./nccDati.component.scss'],
+  providers: [MessageService]
 })
 export class NccDatiComponent {
   nccForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private messageService: MessageService) {
     this.nccForm = this.fb.group({
       nome: ['', Validators.required],
       cognome: ['', Validators.required],
@@ -32,9 +34,16 @@ export class NccDatiComponent {
     });
   }
 
+
   onSubmit(): void {
     if (this.nccForm.valid) {
       console.log('nccForm', this.nccForm.value);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Preventivo Inviato',
+        detail: 'Il tuo preventivo è stato inviato con successo.'
+      });
+      
     }
   }
 }
