@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -11,12 +10,13 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { AutoFocus } from "primeng/autofocus";
 import { MessageService } from 'primeng/api';
+import { Toast } from "primeng/toast";
 
 
 @Component({
   selector: 'app-ncc',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule, AutoFocus],
+  imports: [CommonModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule, AutoFocus, Toast],
   templateUrl: './nccDati.component.html',
   styleUrls: ['./nccDati.component.scss'],
   providers: [MessageService]
