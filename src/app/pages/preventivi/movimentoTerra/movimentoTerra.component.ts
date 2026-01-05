@@ -10,6 +10,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-movimento-terra',
@@ -36,10 +37,14 @@ export class MovimentoTerraComponent {
       console.log('MovimentoTerraForm', this.MovimentoTerraForm.value);
       this.messageService.add({
         severity: 'success',
-        summary: 'Preventivo Inviato',
-        detail: 'Il tuo preventivo è stato inviato con successo.'
+        summary: 'Preventivo Inviato!',
+        detail: 'Ti contatteremo al più presto!'
       });
-      
+      this.MovimentoTerraForm.reset();
+      timer(2000).subscribe(() => {
+        // Reindirizza alla home page dopo 3 secondi
+        window.location.href = '/';
+      });
     }
     else { // Da gestire il caso in cui il form non è valido
       this.messageService.add({

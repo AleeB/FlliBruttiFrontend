@@ -11,6 +11,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { AutoFocus } from "primeng/autofocus";
 import { MessageService } from 'primeng/api';
 import { Toast } from "primeng/toast";
+import { timer } from 'rxjs';
 
 
 @Component({
@@ -40,10 +41,14 @@ export class NccDatiComponent {
       console.log('nccForm', this.nccForm.value);
       this.messageService.add({
         severity: 'success',
-        summary: 'Preventivo Inviato',
-        detail: 'Il tuo preventivo è stato inviato con successo.'
+        summary: 'Preventivo Inviato!',
+        detail: 'Ti contatteremo al più presto!'
       });
-      
+      this.nccForm.reset();
+      timer(2000).subscribe(() => {
+        // Reindirizza alla home page dopo 3 secondi
+        window.location.href = '/';
+      });
     }
   }
 }
