@@ -16,10 +16,15 @@ import { AutoFocusModule } from 'primeng/autofocus';
 export class LoginComponent {
   username = '';
   password = '';
-  toggleMask = true;
 
   login() {
+    if (!this.username || !this.password) {
+      alert('Inserire username e password per accedere!');
+      return;
+    }
     // TODO: call AuthService.login and handle JWT
     console.log('login', this.username);
+
+    
   }
 }
