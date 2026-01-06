@@ -33,21 +33,22 @@
                         formControlName="mail"
                         placeholder="esempio@dominio.it"
                         class="w-full" />
-                </div>
-                <!-- Numero di Telefono -->
-                <div class="form-group">
-                    <label for="telefono">Numero di Telefono</label>
-                    <input 
+                    </div>
+                    <!-- Numero di Telefono -->
+                    <div class="form-group">
+                        <label for="telefono">Numero di Telefono</label>
+                        <input 
                         pInputText 
                         id="telefono" 
                         formControlName="telefono"
                         placeholder="Inserisci numero di telefono"
                         class="w-full" />
-                </div>
-                <!-- Richiesta dettagliata -->
-                <div class="form-group-full">
-                    <label for="dettagli">Richiesta dettagliata</label>
-                    <textarea 
+                    </div>
+    
+                    <!-- Richiesta dettagliata -->
+                    <div class="form-group-full">
+                        <label for="dettagli">Richiesta dettagliata</label>
+                        <textarea 
                         rows="5"
                         cols="30" 
                         pTextarea [autoResize]="true"
@@ -56,7 +57,20 @@
                         placeholder="Descrivi nel dettaglio la tua richiesta">
                     </textarea>
                 </div>
+
+                    <!-- Caricamento Foto -->
+                    <!-- DA GESTIRE NELL'INVIO DEL FORM  -->
+                    <label class="upload-photo lb" for="foto">Carica Foto (opzionale)</label>
+                    <p-fileupload #fu class="upload-photo"
+                    mode="basic" 
+                    chooseLabel="Inserisci Foto" 
+                    chooseIcon="pi pi-upload" 
+                    name="foto" 
+                    url="" 
+                    accept="image/*" 
+                    maxFileSize="20000000"/>
             </div>
+            
 
             <!-- Azioni -->
             <div class="form-actions">

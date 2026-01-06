@@ -11,11 +11,12 @@ import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { timer } from 'rxjs';
+import { FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-movimento-terra',
   standalone: true,
-  imports: [CommonModule, ToastModule, RouterModule, ButtonModule, TableModule,  FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule],
+  imports: [CommonModule, FileUpload, ToastModule, RouterModule, ButtonModule, TableModule,  FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule],
   templateUrl: './movimentoTerra.component.html',
   styleUrls: ['./movimentoTerra.component.scss'],
   providers: [MessageService]
@@ -45,8 +46,7 @@ export class MovimentoTerraComponent {
         // Reindirizza alla home page dopo 3 secondi
         window.location.href = '/';
       });
-    }
-    else { // Da gestire il caso in cui il form non è valido
+    } else { // Da gestire il caso in cui il form non è valido
       this.messageService.add({
         severity: 'error',
         summary: 'Errore',

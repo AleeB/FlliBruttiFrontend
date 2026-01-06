@@ -89,6 +89,15 @@
     }
 }
 
+.upload-photo{
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        text-align: right;
+}
+
+
+
 .form-actions {
     display: flex;
     gap: 1rem;
@@ -130,5 +139,9 @@
         button {
             width: 100%;
         }
+    }
+
+    .upload-photo{
+        text-align: left;
     }
 }
