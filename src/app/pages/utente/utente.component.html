@@ -1,59 +1,63 @@
-<div class="utente-container">
-    <!-- Header con nome utente -->
-    <div class="utente-header">
-        <h1>{{ nomeUtente }}</h1>
-    </div>
+<div class="utente-container" [class.isAdmin]="isAdmin">
+    <!-- SE ADMIN COLORE SFONDO DIVERSO -->
 
-    <!-- Sezione Firma Entrata/Uscita -->
-    <div class="firma-section">
-        <p class="firma-time">{{ oraFirma | date: 'd MMM y' : 'UTC+1' }}</p>
-        <button class="firma-btn" (click)="toggleFirma()">
-            {{ isEntrata ? 'FIRMA ENTRATA' : 'FIRMA USCITA' }}
-        </button>
-        <p class="firma-time">{{ oraFirma | date: 'HH:mm:ss' }}</p>
-    </div>
+        <!-- Header con nome utente -->
+        <div class="utente-header">
 
-    <!-- Sezione Filtro -->
-    <div class="filtro-section">
-        <input 
+            <span *ngIf="isAdmin">Amministratore</span><h1>{{ nomeUtente }}</h1>
+        </div>
+        
+        <!-- Sezione Firma Entrata/Uscita -->
+        <div class="firma-section">
+            <p class="firma-time">{{ oraFirma | date: 'd MMM y' : 'UTC+1' }}</p>
+            <button class="firma-btn" (click)="toggleFirma()">
+                {{ isEntrata ? 'FIRMA ENTRATA' : 'FIRMA USCITA' }}
+            </button>
+            <p class="firma-time">{{ oraFirma | date: 'HH:mm:ss' }}</p>
+        </div>
+        
+        <!-- Sezione Filtro -->
+        <div *ngIf=" isAdmin == true" class="filtro-section">
+            <input 
             type="text" 
             class="filtro-input" 
             placeholder="Filtra per data, progetto, note..."
-        >
-                    <!-- (keyup)="filtroRealtime($event)" -->
-
-    </div>
-
-    <!-- Tabella Orari di Lavoro -->
-    <div class="tabella-section">
-        <table class="orari-table">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Ora Entrata</th>
-                    <th>Ora Uscita</th>
-                    <th>Ore Lavorate</th>
-                    <th>Tipo</th>
-                    <th>Note</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let orario of orariFiltrati">
-                    <td>{{ orario.data | date: 'dd/MM/yyyy' }}</td>
-                    <td>{{ orario.oraEntrata }}</td>
-                    <td>{{ orario.oraUscita }}</td>
-                    <td>{{ orario.oreLavorate }}</td>
-                    <td>{{ orario.tipo }}</td>
-                    <td>{{ orario.note }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Bottone Scarica Orari -->
-    <div class="carica-section">
-        <button class="carica-btn" (click)="scaricaOrari()">
-            Scarica Orari
-        </button>
+            (input)="onInput($event)"
+            >        
+        </div>
+        
+        <!-- Tabella Orari di Lavoro -->    
+        <div class="tabella-section">
+            <table class="orari-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Ora Entrata</th>
+                        <th>Ora Uscita</th>
+                        <th>Ore Lavorate</th>
+                        <th *ngIf=" isAdmin == true">Nome</th>
+                        <th>Tipo</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let orario of timeTableService.orariFiltrati">
+                        <td>{{ orario.data | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ orario.oraEntrata }}</td>
+                        <td>{{ orario.oraUscita }}</td>
+                        <td>{{ orario.oreLavorate }}</td>
+                        <td *ngIf=" isAdmin == true">{{ orario.nome }}</td>
+                        <td>{{ orario.tipo }}</td>
+                        <td>{{ orario.note }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Bottone Scarica Orari -->
+        <div class="carica-section">
+            <button class="carica-btn" (click)="scaricaOrari()">
+                Scarica Orari
+            </button>
     </div>
 </div>

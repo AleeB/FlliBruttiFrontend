@@ -28,4 +28,18 @@ export class AuthService {
       return null;
     }
   }
+
+
+
+  // DA SPIEGARE: questa funzione legge il token JWT (se fornito) o lo recupera dal localStorage del browser.
+  // Decodifica il token per estrarre il ruolo dell'utente e restituisce un codice numerico corrispondente:
+  // 1 per admin, 2 per employee (predefinito).
+  roleCode(token?: string): number {
+    const tok = token ?? (typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null) ?? '';
+    const decoded = this.decode(tok);
+    if (!decoded || !decoded.role) return 1;
+    return decoded.role === 'admin' ? 2 : 1;
+  }
+
+  
 }

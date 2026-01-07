@@ -1,9 +1,13 @@
+
 .utente-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 2rem;
+}
+.isAdmin {
+    background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
 }
 
 .utente-header {

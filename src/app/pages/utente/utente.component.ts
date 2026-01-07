@@ -1,15 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TimeTableService } from '../../services/timeTable.service';
+import { AuthService } from '../../services/auth.service';
 
-interface OrarioLavoro {
-  data: Date;
-  oraEntrata: string;
-  oraUscita: string;
-  oreLavorate: number;
-  tipo: 'Ufficio' | 'Smart Working' | 'Ferie';
-  note?: string;
-}
+
 
 @Component({
   selector: 'app-utente',
@@ -18,48 +13,36 @@ interface OrarioLavoro {
   templateUrl: './utente.component.html',
   styleUrl: './utente.component.scss',
 })
-export class UtenteComponent implements OnInit, OnDestroy {
 
-  orariFiltrati: OrarioLavoro[] = [
-    { 
-      data: new Date(2026, 0, 5),
-      oraEntrata: '09:00',
-      oraUscita: '18:00',
-      oreLavorate: 8,
-      tipo: 'Ufficio',
-      note: 'Progetto Alpha'
-    },
-    {
-      data: new Date(2026, 0, 6),
-      oraEntrata: '08:30',
-      oraUscita: '17:30',
-      oreLavorate: 8,
-      tipo: 'Smart Working',
-      note: 'Meeting cliente'
-    },
-    {
-      data: new Date(2026, 0, 7),
-      oraEntrata: '-',
-      oraUscita: '-',
-      oreLavorate: 0,
-      tipo: 'Ferie',
-      note: 'Ferie invernali'
-    }
-  ];
+export class UtenteComponent implements OnInit, OnDestroy {
   
-  nomeUtente = 'Mario Rossi';
-  oraFirma = new Date();
+
+  constructor (public authService: AuthService, public timeTableService: TimeTableService) {}
+  
+  // nome utente simulato, da sostituire con dati passati dal backend
+  nomeUtente: string = 'Mario Rossi'; 
+  isAdmin = false;
+  oraFirma: Date = new Date();
   private timerId?: any;
   isEntrata = true;
+  utenteContainer = "utente-container";
 
+  // INIZIALIZZA IL COMPONENTE, IMPOSTA IL RUOLO DELL'UTENTE E AVVIA IL TIMER PER L'OROLOGIO
+  // 1 = admin, 2 = employee
   ngOnInit(): void { 
+    this.isAdmin = this.authService.roleCode() === 1;
     this.oraFirma = new Date();
     this.timerId = setInterval(() => {
       this.oraFirma = new Date();
     }, 1000);
   }
 
-    ngOnDestroy(): void {
+  onInput(e : any): void {
+    const q = e?.target?.value ?? '';
+    this.timeTableService.filterByName(q);
+  }
+
+  ngOnDestroy(): void {
     if (this.timerId) {
       clearInterval(this.timerId);
     }
