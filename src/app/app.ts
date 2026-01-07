@@ -12,5 +12,5 @@ import { LogoComponent } from './components/logo/logo.component';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('FE');
+  protected readonly title = signal('FLLI BRUTTI');
 }

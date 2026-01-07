@@ -7,5 +7,6 @@ export const routes: Routes = [
 	{ path: 'nccDati', title: 'NCCDati', loadComponent: () => import('./pages/preventivi/nccDati/nccDati.component').then(m => m.NccDatiComponent) },
 	{ path: 'ncc', title: 'NCC', loadComponent: () => import('./pages/preventivi/ncc/ncc.component').then(m => m.NccComponent) },
 	{ path: 'movimento-terra', title: 'Movimento Terra', loadComponent: () => import('./pages/preventivi/movimentoTerra/movimentoTerra.component').then(m => m.MovimentoTerraComponent) },
-	{ path: 'preventivi', title: 'Preventivi', loadComponent: () => import('./pages/preventivi/preventivi.component').then(m => m.PreventiviComponent) }
+	{ path: 'preventivi', title: 'Preventivi', loadComponent: () => import('./pages/preventivi/preventivi.component').then(m => m.PreventiviComponent) },
+	{ path: 'utente', title: 'Utente', loadComponent: () => import('./pages/utente/utente.component').then(m => m.UtenteComponent) }
 ];
