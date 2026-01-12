@@ -4,6 +4,8 @@
   <h2>Accedi al sistema</h2>
   <form (ngSubmit)="login()">
     <h3>Username<input [pAutoFocus]="true" name="username" [(ngModel)]="username" /></h3>
+    <!-- ngModel per il two-way data binding e controllo del valore dell'input -->
+    <br>
     <h3>Password<input name="password" type="password" [(ngModel)]="password">
     </h3><br>
     <button pButton type="submit" label="Login"></button>

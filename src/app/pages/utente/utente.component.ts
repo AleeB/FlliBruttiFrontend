@@ -34,6 +34,7 @@ export class UtenteComponent implements OnInit, OnDestroy {
     this.oraFirma = new Date();
     this.timerId = setInterval(() => {
       this.oraFirma = new Date();
+      console.log('Aggiornamento orario firma:', this.oraFirma);
     }, 1000);
   }
 

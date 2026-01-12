@@ -1,6 +1,9 @@
 <div class="utente-container" [class.isAdmin]="isAdmin">
     <!-- SE ADMIN COLORE SFONDO DIVERSO -->
 
+    <!-- DA AGGIUNGERE FUNZIONALITA AL BOTTONE SCATRICA ORARI - DA TOGLIERE GLI UTENTI  -->
+    <!-- VISIBILI NELLA TABELLA SE NON ADMIN O DIVERSI DALL'UTENTE LOGGATO -->
+    <!-- SETTARE I JWT PER PRENDERE IL NOME E COGNOME DELL'UTENTE LOGGATO E MOSTRARLO NELLA TABELLA SOLO SE ADMIN O DIVERSO DALL'UTENTE LOGGATO -->
         <!-- Header con nome utente -->
         <div class="utente-header">
 
@@ -13,7 +16,7 @@
             <button class="firma-btn" (click)="toggleFirma()">
                 {{ isEntrata ? 'FIRMA ENTRATA' : 'FIRMA USCITA' }}
             </button>
-            <p class="firma-time">{{ oraFirma | date: 'HH:mm:ss' }}</p>
+            <p class="firma-time min">{{ oraFirma | date: 'HH:mm' }}</p>
         </div>
         
         <!-- Sezione Filtro -->
