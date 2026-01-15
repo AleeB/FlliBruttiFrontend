@@ -50,6 +50,9 @@
 .header-actions{display:flex;align-items:center;gap:.6rem;margin-left:.5rem}
 .header-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,0,0,0.06);box-shadow:0 6px 18px rgba(2,8,23,0.18)}
 .header-login{--p-button-bg: linear-gradient(90deg,#ffb86b,#ff7a7a);height:38px;padding:0 12px;display:inline-flex;align-items:center}
+.header-user{display:flex;align-items:center;gap:.5rem;padding:.3rem .85rem;border-radius:999px;background:rgba(255,255,255,0.82);color:#072033;text-decoration:none;font-weight:600;box-shadow:0 6px 18px rgba(2,8,23,0.12)}
+.header-user span{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.header-user i{color:#072033}
 
 @media (max-width:520px){
 	.app-title{display:none}

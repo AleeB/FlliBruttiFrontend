@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, catchError, map, tap, throwError } from 'r
 import { jwtDecode } from 'jwt-decode';
 
 interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -13,6 +13,7 @@ type LoginResponse = { token?: string; jwt?: string; accessToken?: string } | st
 interface JwtPayload {
   exp?: number;
   role?: string;
+  email?: string;
   username?: string;
   sub?: string;
   [key: string]: unknown;
@@ -32,8 +33,8 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string): Observable<string> {
-    const payload: LoginRequest = { username, password };
+  login(email: string, password: string): Observable<string> {
+    const payload: LoginRequest = { email, password };
 
     return this.http.post<LoginResponse>(this.loginUrl, payload).pipe(
       map((response) => this.extractToken(response)),
@@ -84,6 +85,22 @@ export class AuthService {
 
     const decoded = this.decode(tok);
     return typeof decoded?.role === 'string' ? decoded.role : null;
+  }
+
+  getUserIdentity(token?: string): string | null {
+    const tok = token ?? this.getToken();
+    if (!tok) {
+      return null;
+    }
+
+    const decoded = this.decode(tok);
+    return (
+      // prova a ottenere l'identità in vari modi, mail o username o subject
+      (typeof decoded?.username === 'string' && decoded.username) ||
+      (typeof decoded?.email === 'string' && decoded.email) ||
+      (typeof decoded?.sub === 'string' && decoded.sub) ||
+      null
+    );
   }
 
   roleCode(token?: string): UserRoleCode {

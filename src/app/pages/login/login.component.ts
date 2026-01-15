@@ -17,7 +17,7 @@ import { finalize } from 'rxjs';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  username = '';
+  email = '';
   password = '';
   errorMessage = '';
   isSubmitting = false;
@@ -26,16 +26,16 @@ export class LoginComponent {
 
   login() {
     this.errorMessage = '';
-    const username = this.username.trim();
+    const email = this.email.trim();
 
-    if (!username || !this.password) {
-      this.errorMessage = 'Inserire username e password per accedere.';
+    if (!email || !this.password) {
+      this.errorMessage = 'Inserire email e password per accedere.';
       return;
     }
 
     this.isSubmitting = true;
     this.authService
-      .login(username, this.password)
+      .login(email, this.password)
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: () => {

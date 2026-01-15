@@ -31,6 +31,10 @@ export class UtenteComponent implements OnInit, OnDestroy {
   // 1 = admin, 2 = employee
   ngOnInit(): void { 
     this.isAdmin = this.authService.roleCode() === UserRoleCode.Admin;
+    const identity = this.authService.getUserIdentity();
+    if (identity) {
+      this.nomeUtente = identity;
+    }
     this.oraFirma = new Date();
     this.timerId = setInterval(() => {
       this.oraFirma = new Date();

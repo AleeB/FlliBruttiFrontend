@@ -19,8 +19,17 @@
 		</nav>
 
 		<div class="header-actions">
-			<a pButton type="button" label="Login" href="/login/" class="p-button-help header-login"> <i class="pi pi-user" style="color: #000000"></i></a>
-			
+			<ng-container *ngIf="authService.isAuthenticated(); else loginLink">
+				<a class="header-user" href="/utente" [title]="authService.getUserIdentity() || 'Utente'">
+					<i class="pi pi-user" aria-hidden="true"></i>
+					<span>{{ authService.getUserIdentity() || 'Utente' }}</span>
+				</a>
+			</ng-container>
+			<ng-template #loginLink>
+				<a pButton type="button" label="Login" href="/login/" class="p-button-help header-login">
+					<i class="pi pi-user" style="color: #000000"></i>
+				</a>
+			</ng-template>
 		</div>
 	</div>
 
