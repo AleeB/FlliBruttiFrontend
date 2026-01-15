@@ -84,8 +84,7 @@
                     type="submit" 
                     label="Invia Preventivo"
                     class="p-button"
-                    [disabled]="!nccForm.valid"
-                    (onclick)="onSubmit()">
+                    [disabled]="!nccForm.valid || isSubmitting">
                 </button>
             </div>
         </form>

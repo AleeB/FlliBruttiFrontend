@@ -9,26 +9,26 @@
         <form [formGroup]="nccForm" (ngSubmit)="onSubmit()">
             
             <div class="form-grid">
-                <!-- Città di Partenza -->
+                <!-- Citta di Partenza -->
                 <div class="form-group">
-                    <label for="cittaPartenza">Città di Partenza</label>
+                    <label for="cittaPartenza">Citta di Partenza</label>
                     <input 
                         pInputText 
                         id="cittaPartenza"
                         [pAutoFocus]="true" 
                         formControlName="cittaPartenza"
-                        placeholder="Inserisci città di partenza"
+                        placeholder="Inserisci citta di partenza"
                         class="w-full" />
                 </div>
 
-                <!-- Città d'Arrivo -->
+                <!-- Citta d'Arrivo -->
                 <div class="form-group">
-                    <label for="cittaArrivo">Città d'Arrivo</label>
+                    <label for="cittaArrivo">Citta d'Arrivo</label>
                     <input 
                         pInputText 
                         id="cittaArrivo" 
                         formControlName="cittaArrivo"
-                        placeholder="Inserisci città d'arrivo"
+                        placeholder="Inserisci citta d'arrivo"
                         class="w-full" />
                 </div>
             </div>
@@ -36,7 +36,7 @@
             <span><strong>
                 Nota bene: 
             </strong> 
-            Ogni pullman può trasportare fino a 50 persone. Disponibilità dei pullman pari a 2.</span>
+            Ogni pullman puo trasportare fino a 50 persone. Disponibilita dei pullman pari a 2.</span>
 
         <!-- Buttons -->
             <div class="form-actions">
@@ -52,7 +52,6 @@
                     pButton 
                     type="submit" 
                     label="Avanti 2/3"
-                    routerLink="/nccDati"
                     class="p-button"
                     [disabled]="!nccForm.valid">
                 </button>
