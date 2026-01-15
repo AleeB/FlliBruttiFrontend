@@ -25,6 +25,16 @@
         width: 100%;
         max-width: 400px;
 
+        .login-error {
+            margin: 0 0 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background: #fff4f4;
+            border: 1px solid #f3b9b9;
+            color: #a94442;
+            font-size: 0.95rem;
+        }
+
         h3 {
             font-size: 1rem;
             color: #333;

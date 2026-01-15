@@ -5,6 +5,8 @@ import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { finalize } from 'rxjs';
 
 
 @Component({
@@ -17,20 +19,32 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   username = '';
   password = '';
+  errorMessage = '';
+  isSubmitting = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   login() {
-    if (!this.username || !this.password) {
-      alert('Inserire username e password per accedere!');
+    this.errorMessage = '';
+    const username = this.username.trim();
+
+    if (!username || !this.password) {
+      this.errorMessage = 'Inserire username e password per accedere.';
       return;
     }
-    else {
-      // TODO: call AuthService.login and handle JWT
-      console.log('login', this.username);
-      this.router.navigate(['/utente']);
-    }
 
-    
+    this.isSubmitting = true;
+    this.authService
+      .login(username, this.password)
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/utente']);
+        },
+        error: (err: Error) => {
+          this.password = '';
+          this.errorMessage = err.message || 'Login fallito.';
+        }
+      });
   }
 }

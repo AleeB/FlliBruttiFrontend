@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TimeTableService } from '../../services/timeTable.service';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, UserRoleCode } from '../../services/auth.service';
 
 
 
@@ -30,7 +30,7 @@ export class UtenteComponent implements OnInit, OnDestroy {
   // INIZIALIZZA IL COMPONENTE, IMPOSTA IL RUOLO DELL'UTENTE E AVVIA IL TIMER PER L'OROLOGIO
   // 1 = admin, 2 = employee
   ngOnInit(): void { 
-    this.isAdmin = this.authService.roleCode() === 1;
+    this.isAdmin = this.authService.roleCode() === UserRoleCode.Admin;
     this.oraFirma = new Date();
     this.timerId = setInterval(() => {
       this.oraFirma = new Date();
@@ -54,6 +54,8 @@ export class UtenteComponent implements OnInit, OnDestroy {
   }
 
   scaricaOrari(): void {
+    // Simulazione del download dei dati
+    // Da implementare con funzionalità reali
     alert('Scaricando i dati...');
   }
 }
