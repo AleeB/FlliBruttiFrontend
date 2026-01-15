@@ -32,7 +32,7 @@ export class LoginComponent {
       this.errorMessage = 'Inserire email e password per accedere.';
       return;
     }
-
+    
     this.isSubmitting = true;
     this.authService
       .login(email, this.password)

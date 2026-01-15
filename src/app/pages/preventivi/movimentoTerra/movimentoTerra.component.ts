@@ -10,48 +10,86 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { timer } from 'rxjs';
+import { finalize, timer } from 'rxjs';
+import { Router } from '@angular/router';
 import { FileUpload } from 'primeng/fileupload';
+import { MovimentoTerraQuoteStoreService } from '../../../services/movimentoTerra-quote-store.service';
+import { QuoteEmailPayload, QuoteService } from '../../../services/quote.service';
 
 @Component({
   selector: 'app-movimento-terra',
   standalone: true,
-  imports: [CommonModule, FileUpload, ToastModule, RouterModule, ButtonModule, TableModule,  FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule],
+  imports: [CommonModule, FileUpload, ToastModule, RouterModule, ButtonModule, TableModule, FormsModule, ReactiveFormsModule, InputNumberModule, InputTextModule, CheckboxModule, TextareaModule],
   templateUrl: './movimentoTerra.component.html',
   styleUrls: ['./movimentoTerra.component.scss'],
-  providers: [MessageService]
+  providers: [MessageService, MovimentoTerraQuoteStoreService]
 })
 export class MovimentoTerraComponent {
   MovimentoTerraForm: FormGroup;
+  isSubmitting = false;
 
-  constructor(private fb: FormBuilder, private messageService: MessageService) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private messageService: MessageService,
+    private movimentoTerraStore: MovimentoTerraQuoteStoreService,
+    private quoteService: QuoteService
+  ) {
+    const draft = this.movimentoTerraStore.getDraft();
     this.MovimentoTerraForm = this.fb.group({
-      nomeCognome: ['', Validators.required],
-      mail: ['', [Validators.required, Validators.email]],
-      telefono: ['', Validators.minLength(10)],
-      dettagli: ['']
+      nomeCognome: [draft.nomeCognome ?? '', Validators.required],
+      mail: [draft.mail ?? '', [Validators.required, Validators.email]],
+      telefono: [draft.telefono ?? '', Validators.minLength(10)],
+      dettagli: [draft.dettagli ?? '']
     });
   }
 
   onSubmit(): void {
-    if (this.MovimentoTerraForm.valid) {
-      console.log('MovimentoTerraForm', this.MovimentoTerraForm.value);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Preventivo Inviato!',
-        detail: 'Ti contatteremo al più presto!'
-      });
-      this.MovimentoTerraForm.reset();
-      timer(2000).subscribe(() => {
-        // Reindirizza alla home page dopo 3 secondi
-        window.location.href = '/';
-      });
-    } else { // Da gestire il caso in cui il form non è valido
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Errore',
-        detail: 'Si è verificato un errore durante l\'invio del preventivo. Riprova più tardi.'
-      });
+    // Controlla se il form e valido
+    if (this.MovimentoTerraForm.invalid) {
+      this.MovimentoTerraForm.markAllAsTouched();
+      return;
     }
+
+    const { nomeCognome, mail, telefono, dettagli } = this.MovimentoTerraForm.value;
+    this.movimentoTerraStore.update({
+      nomeCognome: nomeCognome?.trim(),
+      mail: mail?.trim(),
+      telefono: telefono?.trim(),
+      dettagli: dettagli?.trim()
+    });
+
+    const payload: QuoteEmailPayload = {
+      to: 'polentalessandro@gmail.com, alessiobrutti@outlook.com',
+      subject: 'Movimento Terra - Richiesta preventivo',
+      body: this.movimentoTerraStore.buildSummary()
+    };
+
+    this.isSubmitting = true;
+    this.quoteService
+      .sendByEmail(payload)
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Preventivo Inviato!',
+            detail: 'Ti contatteremo al piu presto!'
+          });
+          this.MovimentoTerraForm.reset();
+          this.movimentoTerraStore.clear();
+          timer(2000).subscribe(() => {
+            // Reindirizza alla home page dopo 3 secondi
+            this.router.navigate(['/']);
+          });
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Errore',
+            detail: 'Invio preventivo non riuscito. Riprova piu tardi.'
+          });
+        }
+      });
   }
 }

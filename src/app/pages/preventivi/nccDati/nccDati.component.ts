@@ -71,7 +71,7 @@ export class NccDatiComponent implements OnInit {
     });
 
     const payload: QuoteEmailPayload = {
-      to: 'ale.pole1996@gmail.com',
+      to: 'polentalessandro@gmail.com, alessiobrutti@outlook.com',
       subject: 'Richiesta preventivo NCC',
       body: this.nccStore.buildSummary()
     };

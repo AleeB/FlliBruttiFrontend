@@ -87,8 +87,7 @@
                     type="submit" 
                     label="Invia Richiesta"
                     class="p-button"
-                    [disabled]="!MovimentoTerraForm.valid"
-                    (onclick)="onSubmit()">
+                    [disabled]="!MovimentoTerraForm.valid || isSubmitting">
                 </button>
             </div>
         </form>

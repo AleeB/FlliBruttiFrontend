@@ -59,7 +59,7 @@ export class NccQuoteStoreService {
 
   buildSummary(): string {
     return [
-      'Richiesta preventivo NCC',
+      'NCC - Richiesta preventivo',
       `Periodo: ${this.formatDate(this.draft.periodStart)} - ${this.formatDate(this.draft.periodEnd)}`,
       `Citta partenza: ${this.formatValue(this.draft.cittaPartenza)}`,
       `Citta arrivo: ${this.formatValue(this.draft.cittaArrivo)}`,
