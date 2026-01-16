@@ -20,9 +20,9 @@
 
 		<div class="header-actions">
 			<ng-container *ngIf="authService.isAuthenticated(); else loginLink">
-				<a class="header-user" href="/utente" [title]="authService.getUserIdentity() || 'Utente'">
+				<a class="header-user" href="/utente" [title]="authService.getUserDisplayName() || 'Utente'">
 					<i class="pi pi-user" aria-hidden="true"></i>
-					<span>{{ authService.getUserIdentity() || 'Utente' }}</span>
+					<span>{{ authService.getUserDisplayName() || 'Utente' }}</span>
 				</a>
 				<button
 					pButton

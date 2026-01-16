@@ -10,6 +10,9 @@ interface LoginRequest {
 
 interface LoginUser {
   type?: number | string;
+  name?: string;
+  surname?: string;
+  email?: string;
 }
 
 type LoginResponse =
@@ -40,9 +43,11 @@ export enum UserRoleCode {
 export class AuthService {
   private readonly tokenStorageKey = 'token';
   private readonly roleStorageKey = 'userType';
+  private readonly displayNameStorageKey = 'userDisplayName';
   private readonly loginUrl = '/api/Login';
   private inMemoryToken: string | null = null;
   private inMemoryRoleType?: UserRoleCode | null;
+  private inMemoryDisplayName?: string | null;
   private authState$ = new BehaviorSubject<boolean>(this.hasValidToken());
 
   constructor(private http: HttpClient) {}
@@ -54,7 +59,9 @@ export class AuthService {
       map((response) => {
         const token = this.extractToken(response);
         const roleType = this.extractUserType(response);
+        const displayName = this.extractUserDisplayName(response);
         this.storeUserType(roleType);
+        this.storeUserDisplayName(displayName);
         return token;
       }),
       tap((token) => this.storeToken(token)),
@@ -112,18 +119,47 @@ export class AuthService {
   }
 
   getUserIdentity(token?: string): string | null {
+    return this.getUserDisplayName(token);
+  }
+
+  getUserDisplayName(token?: string): string | null {
+    const stored = this.getStoredUserDisplayName();
+    if (stored) {
+      return stored;
+    }
+
     const tok = token ?? this.getToken();
     if (!tok) {
       return null;
     }
 
     const decoded = this.decode(tok);
+    const name = this.normalizeNamePart(decoded?.['PersonName']);
+    const surname = this.normalizeNamePart(decoded?.['PersonSurname']);
+    const fullName = this.buildFullName(name, surname);
+    if (fullName) {
+      return fullName;
+    }
+
+    const username = this.normalizeNamePart(decoded?.username);
+    if (username) {
+      return username;
+    }
+
+    const email =
+      this.normalizeNamePart(decoded?.email) ??
+      this.normalizeNamePart(
+        decoded?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+      );
+    if (email) {
+      return email;
+    }
+
     return (
-      // prova a ottenere l'identità in vari modi, mail o username o subject
-      (typeof decoded?.username === 'string' && decoded.username) ||
-      (typeof decoded?.email === 'string' && decoded.email) ||
-      (typeof decoded?.sub === 'string' && decoded.sub) ||
-      null
+      this.normalizeNamePart(decoded?.sub) ??
+      this.normalizeNamePart(
+        decoded?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+      )
     );
   }
 
@@ -161,6 +197,21 @@ export class AuthService {
     );
   }
 
+  private extractUserDisplayName(response: LoginResponse): string | null {
+    if (typeof response === 'string') {
+      return null;
+    }
+
+    const name = this.normalizeNamePart(response.user?.name);
+    const surname = this.normalizeNamePart(response.user?.surname);
+    const fullName = this.buildFullName(name, surname);
+    if (fullName) {
+      return fullName;
+    }
+
+    return this.normalizeNamePart(response.user?.email);
+  }
+
   private parseUserType(value: unknown): UserRoleCode | null {
     if (value === undefined || value === null) {
       return null;
@@ -184,6 +235,7 @@ export class AuthService {
     this.inMemoryToken = null;
     this.getStorage()?.removeItem(this.tokenStorageKey);
     this.clearUserType();
+    this.clearUserDisplayName();
     this.authState$.next(false);
   }
 
@@ -206,6 +258,37 @@ export class AuthService {
     this.storeUserType(null);
   }
 
+  private storeUserDisplayName(name: string | null): void {
+    const normalized = this.normalizeNamePart(name);
+    this.inMemoryDisplayName = normalized;
+    const storage = this.getStorage();
+    if (!storage) {
+      return;
+    }
+
+    if (!normalized) {
+      storage.removeItem(this.displayNameStorageKey);
+      return;
+    }
+
+    storage.setItem(this.displayNameStorageKey, normalized);
+  }
+
+  private clearUserDisplayName(): void {
+    this.storeUserDisplayName(null);
+  }
+
+  private getStoredUserDisplayName(): string | null {
+    if (this.inMemoryDisplayName !== undefined) {
+      return this.inMemoryDisplayName;
+    }
+
+    const stored = this.getStorage()?.getItem(this.displayNameStorageKey);
+    const normalized = this.normalizeNamePart(stored);
+    this.inMemoryDisplayName = normalized;
+    return normalized;
+  }
+
   private getStoredUserType(): UserRoleCode | null {
     if (this.inMemoryRoleType !== undefined) {
       return this.inMemoryRoleType;
@@ -219,6 +302,23 @@ export class AuthService {
 
   private getStorage(): Storage | null {
     return typeof localStorage === 'undefined' ? null : localStorage;
+  }
+
+  private normalizeNamePart(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+
+  private buildFullName(name: string | null, surname: string | null): string | null {
+    if (name && surname) {
+      return `${name} ${surname}`;
+    }
+
+    return name || surname || null;
   }
 
   private hasValidToken(): boolean {
