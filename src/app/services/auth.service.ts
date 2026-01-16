@@ -8,7 +8,19 @@ interface LoginRequest {
   password: string;
 }
 
-type LoginResponse = { token?: string; jwt?: string; accessToken?: string } | string;
+interface LoginUser {
+  type?: number | string;
+}
+
+type LoginResponse =
+  | {
+      token?: string;
+      jwt?: string;
+      accessToken?: string;
+      type?: number | string;
+      user?: LoginUser;
+    }
+  | string;
 
 interface JwtPayload {
   exp?: number;
@@ -27,8 +39,10 @@ export enum UserRoleCode {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly tokenStorageKey = 'token';
+  private readonly roleStorageKey = 'userType';
   private readonly loginUrl = '/api/Login';
   private inMemoryToken: string | null = null;
+  private inMemoryRoleType?: UserRoleCode | null;
   private authState$ = new BehaviorSubject<boolean>(this.hasValidToken());
 
   constructor(private http: HttpClient) {}
@@ -37,7 +51,12 @@ export class AuthService {
     const payload: LoginRequest = { email, password };
 
     return this.http.post<LoginResponse>(this.loginUrl, payload).pipe(
-      map((response) => this.extractToken(response)),
+      map((response) => {
+        const token = this.extractToken(response);
+        const roleType = this.extractUserType(response);
+        this.storeUserType(roleType);
+        return token;
+      }),
       tap((token) => this.storeToken(token)),
       catchError((err) => throwError(() => this.normalizeLoginError(err)))
     );
@@ -45,6 +64,7 @@ export class AuthService {
 
   logout(): void {
     this.clearToken();
+    // chiama il backend per invalidare la sessione se necessario
   }
 
   isAuthenticated(): boolean {
@@ -84,7 +104,11 @@ export class AuthService {
     }
 
     const decoded = this.decode(tok);
-    return typeof decoded?.role === 'string' ? decoded.role : null;
+    const role =
+      decoded?.role ??
+      decoded?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
+      decoded?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'];
+    return typeof role === 'string' ? role : null;
   }
 
   getUserIdentity(token?: string): string | null {
@@ -104,8 +128,14 @@ export class AuthService {
   }
 
   roleCode(token?: string): UserRoleCode {
+    const storedType = this.getStoredUserType();
+    if (storedType !== null) {
+      return storedType;
+    }
+
     const role = this.getUserRole(token);
-    return role === 'admin' ? UserRoleCode.Admin : UserRoleCode.Employee;
+    const parsedRole = this.parseUserType(role);
+    return parsedRole ?? UserRoleCode.Employee;
   }
 
   private extractToken(response: LoginResponse): string {
@@ -121,6 +151,29 @@ export class AuthService {
     return token;
   }
 
+  private extractUserType(response: LoginResponse): UserRoleCode | null {
+    if (typeof response === 'string') {
+      return null;
+    }
+
+    return (
+      this.parseUserType(response.type) ?? this.parseUserType(response.user?.type)
+    );
+  }
+
+  private parseUserType(value: unknown): UserRoleCode | null {
+    if (value === undefined || value === null) {
+      return null;
+    }
+
+    const numeric = typeof value === 'number' ? value : Number(value);
+    if (numeric === UserRoleCode.Admin || numeric === UserRoleCode.Employee) {
+      return numeric;
+    }
+
+    return null;
+  }
+
   private storeToken(token: string): void {
     this.inMemoryToken = token;
     this.getStorage()?.setItem(this.tokenStorageKey, token);
@@ -130,7 +183,38 @@ export class AuthService {
   private clearToken(): void {
     this.inMemoryToken = null;
     this.getStorage()?.removeItem(this.tokenStorageKey);
+    this.clearUserType();
     this.authState$.next(false);
+  }
+
+  private storeUserType(type: UserRoleCode | null): void {
+    this.inMemoryRoleType = type;
+    const storage = this.getStorage();
+    if (!storage) {
+      return;
+    }
+
+    if (type === null) {
+      storage.removeItem(this.roleStorageKey);
+      return;
+    }
+
+    storage.setItem(this.roleStorageKey, String(type));
+  }
+
+  private clearUserType(): void {
+    this.storeUserType(null);
+  }
+
+  private getStoredUserType(): UserRoleCode | null {
+    if (this.inMemoryRoleType !== undefined) {
+      return this.inMemoryRoleType;
+    }
+
+    const stored = this.getStorage()?.getItem(this.roleStorageKey);
+    const parsed = stored ? this.parseUserType(stored) : null;
+    this.inMemoryRoleType = parsed;
+    return parsed;
   }
 
   private getStorage(): Storage | null {
