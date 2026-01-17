@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, catchError, map, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, tap, throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 
 interface LoginRequest {
@@ -20,6 +20,7 @@ type LoginResponse =
       token?: string;
       jwt?: string;
       accessToken?: string;
+      refreshToken?: string;
       type?: number | string;
       user?: LoginUser;
     }
@@ -42,10 +43,14 @@ export enum UserRoleCode {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly tokenStorageKey = 'token';
+  private readonly refreshTokenStorageKey = 'refreshToken';
   private readonly roleStorageKey = 'userType';
   private readonly displayNameStorageKey = 'userDisplayName';
   private readonly loginUrl = '/api/Login';
+  private readonly refreshUrl = '/api/Login/refresh';
+  private readonly logoutUrl = '/api/Login/Logout';
   private inMemoryToken: string | null = null;
+  private inMemoryRefreshToken?: string | null;
   private inMemoryRoleType?: UserRoleCode | null;
   private inMemoryDisplayName?: string | null;
   private authState$ = new BehaviorSubject<boolean>(this.hasValidToken());
@@ -60,8 +65,10 @@ export class AuthService {
         const token = this.extractToken(response);
         const roleType = this.extractUserType(response);
         const displayName = this.extractUserDisplayName(response);
+        const refreshToken = this.extractRefreshToken(response);
         this.storeUserType(roleType);
         this.storeUserDisplayName(displayName);
+        this.storeRefreshToken(refreshToken);
         return token;
       }),
       tap((token) => this.storeToken(token)),
@@ -70,8 +77,34 @@ export class AuthService {
   }
 
   logout(): void {
+    const refreshToken = this.getRefreshToken();
     this.clearToken();
-    // chiama il backend per invalidare la sessione se necessario
+    if (!refreshToken) {
+      return;
+    }
+
+    this.http
+      .post<void>(this.logoutUrl, { refreshToken })
+      .pipe(catchError(() => of(void 0)))
+      .subscribe();
+  }
+
+  refreshAccessToken(): Observable<string> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('Refresh token non disponibile.'));
+    }
+
+    return this.http.post<LoginResponse>(this.refreshUrl, { refreshToken }).pipe(
+      map((response) => {
+        const token = this.extractToken(response);
+        const newRefreshToken = this.extractRefreshToken(response) ?? refreshToken;
+        this.storeToken(token);
+        this.storeRefreshToken(newRefreshToken);
+        return token;
+      }),
+      catchError((err) => throwError(() => this.normalizeLoginError(err)))
+    );
   }
 
   isAuthenticated(): boolean {
@@ -89,11 +122,17 @@ export class AuthService {
     }
 
     if (this.isTokenExpired(token)) {
-      this.clearToken();
+      this.clearAccessToken();
       return null;
     }
 
     return token;
+  }
+
+  getRefreshToken(): string | null {
+    const refreshToken =
+      this.inMemoryRefreshToken ?? this.getStorage()?.getItem(this.refreshTokenStorageKey);
+    return refreshToken ?? null;
   }
 
   decode(token: string): JwtPayload | null {
@@ -179,12 +218,21 @@ export class AuthService {
       return response;
     }
 
+    // Try multiple possible token fields
     const token = response.token ?? response.jwt ?? response.accessToken;
     if (!token) {
       throw new Error('Token non presente nella risposta di login.');
     }
 
     return token;
+  }
+
+  private extractRefreshToken(response: LoginResponse): string | null {
+    if (typeof response === 'string') {
+      return null;
+    }
+
+    return response.refreshToken ?? null;
   }
 
   private extractUserType(response: LoginResponse): UserRoleCode | null {
@@ -202,6 +250,7 @@ export class AuthService {
       return null;
     }
 
+    // costruisci il nome completo se possibile
     const name = this.normalizeNamePart(response.user?.name);
     const surname = this.normalizeNamePart(response.user?.surname);
     const fullName = this.buildFullName(name, surname);
@@ -212,6 +261,7 @@ export class AuthService {
     return this.normalizeNamePart(response.user?.email);
   }
 
+  // parsa il tipo utente da valore numerico o stringa
   private parseUserType(value: unknown): UserRoleCode | null {
     if (value === undefined || value === null) {
       return null;
@@ -225,20 +275,49 @@ export class AuthService {
     return null;
   }
 
+  // memorizza il token in memoria e nel localStorage
   private storeToken(token: string): void {
     this.inMemoryToken = token;
     this.getStorage()?.setItem(this.tokenStorageKey, token);
     this.authState$.next(true);
   }
 
+  // rimuove il token e le informazioni utente memorizzate
   private clearToken(): void {
-    this.inMemoryToken = null;
-    this.getStorage()?.removeItem(this.tokenStorageKey);
+    this.clearAccessToken();
     this.clearUserType();
     this.clearUserDisplayName();
+    this.clearRefreshToken();
+  }
+
+  // rimuove solo l'access token mantenendo il refresh token
+  private clearAccessToken(): void {
+    this.inMemoryToken = null;
+    this.getStorage()?.removeItem(this.tokenStorageKey);
     this.authState$.next(false);
   }
 
+  // memorizza il refresh token in memoria e nel localStorage
+  private storeRefreshToken(token: string | null): void {
+    this.inMemoryRefreshToken = token;
+    const storage = this.getStorage();
+    if (!storage) {
+      return;
+    }
+
+    if (!token) {
+      storage.removeItem(this.refreshTokenStorageKey);
+      return;
+    }
+
+    storage.setItem(this.refreshTokenStorageKey, token);
+  }
+
+  private clearRefreshToken(): void {
+    this.storeRefreshToken(null);
+  }
+
+  // memorizza il tipo utente in memoria e nel localStorage
   private storeUserType(type: UserRoleCode | null): void {
     this.inMemoryRoleType = type;
     const storage = this.getStorage();
@@ -258,6 +337,7 @@ export class AuthService {
     this.storeUserType(null);
   }
 
+  // memorizza il nome visualizzato dell'utente in memoria e nel localStorage
   private storeUserDisplayName(name: string | null): void {
     const normalized = this.normalizeNamePart(name);
     this.inMemoryDisplayName = normalized;
@@ -274,10 +354,12 @@ export class AuthService {
     storage.setItem(this.displayNameStorageKey, normalized);
   }
 
+  // pulisce il nome visualizzato dell'utente memorizzato
   private clearUserDisplayName(): void {
     this.storeUserDisplayName(null);
   }
 
+  // recupera il nome visualizzato dell'utente memorizzato
   private getStoredUserDisplayName(): string | null {
     if (this.inMemoryDisplayName !== undefined) {
       return this.inMemoryDisplayName;
@@ -289,6 +371,7 @@ export class AuthService {
     return normalized;
   }
 
+  // recupera il tipo utente memorizzato
   private getStoredUserType(): UserRoleCode | null {
     if (this.inMemoryRoleType !== undefined) {
       return this.inMemoryRoleType;
@@ -304,6 +387,8 @@ export class AuthService {
     return typeof localStorage === 'undefined' ? null : localStorage;
   }
 
+  // normalizza una parte del nome, restituendo null se non valida
+  // la normalizzo perché forse arriva vuota o con spazi
   private normalizeNamePart(value: unknown): string | null {
     if (typeof value !== 'string') {
       return null;
@@ -312,6 +397,7 @@ export class AuthService {
     const trimmed = value.trim();
     return trimmed ? trimmed : null;
   }
+
 
   private buildFullName(name: string | null, surname: string | null): string | null {
     if (name && surname) {
@@ -330,12 +416,14 @@ export class AuthService {
     return !this.isTokenExpired(token);
   }
 
+  // verifica se il token JWT è scaduto
   private isTokenExpired(token: string): boolean {
     const payload = this.decode(token);
     if (!payload?.exp) {
       return false;
     }
 
+    //
     return payload.exp * 1000 <= Date.now();
   }
 
