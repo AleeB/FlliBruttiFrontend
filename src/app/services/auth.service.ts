@@ -15,12 +15,15 @@ interface LoginUser {
   email?: string;
 }
 
-type  LoginResponse =
+type LastFirma = Record<string, unknown>;
+
+type LoginResponse =
   | {
       token?: string;
       jwt?: string;
       accessToken?: string;
       refreshToken?: string;
+      lastFirma?: LastFirma | null;
       type?: number | string;
       user?: LoginUser;
     }
@@ -46,6 +49,7 @@ export class AuthService {
   private readonly refreshTokenStorageKey = 'refreshToken';
   private readonly roleStorageKey = 'userType';
   private readonly displayNameStorageKey = 'userDisplayName';
+  private readonly lastFirmaStorageKey = 'lastFirma';
   private readonly loginUrl = '/api/Login';
   private readonly refreshUrl = '/api/Login/refresh';
   private readonly logoutUrl = '/api/Login/Logout';
@@ -53,6 +57,7 @@ export class AuthService {
   private inMemoryRefreshToken?: string | null;
   private inMemoryRoleType?: UserRoleCode | null;
   private inMemoryDisplayName?: string | null;
+  private inMemoryLastFirma?: LastFirma | null;
   private authState$ = new BehaviorSubject<boolean>(this.hasValidToken());
 
   constructor(private http: HttpClient) {}
@@ -66,9 +71,11 @@ export class AuthService {
         const roleType = this.extractUserType(response);
         const displayName = this.extractUserDisplayName(response);
         const refreshToken = this.extractRefreshToken(response);
+        const lastFirma = this.extractLastFirma(response);
         this.storeUserType(roleType);
         this.storeUserDisplayName(displayName);
         this.storeRefreshToken(refreshToken);
+        this.storeLastFirma(lastFirma);
         return token;
       }),
       tap((token) => this.storeToken(token)),
@@ -99,8 +106,10 @@ export class AuthService {
       map((response) => {
         const token = this.extractToken(response);
         const newRefreshToken = this.extractRefreshToken(response) ?? refreshToken;
+        const lastFirma = this.extractLastFirma(response);
         this.storeToken(token);
         this.storeRefreshToken(newRefreshToken);
+        this.storeLastFirma(lastFirma);
         return token;
       }),
       catchError((err) => throwError(() => this.normalizeLoginError(err)))
@@ -133,6 +142,14 @@ export class AuthService {
     const refreshToken =
       this.inMemoryRefreshToken ?? this.getStorage()?.getItem(this.refreshTokenStorageKey);
     return refreshToken ?? null;
+  }
+
+  getLastFirma(): LastFirma | null {
+    return this.getStoredLastFirma();
+  }
+
+  updateLastFirma(value: unknown): void {
+    this.storeLastFirma(this.normalizeLastFirma(value));
   }
 
   decode(token: string): JwtPayload | null {
@@ -235,6 +252,14 @@ export class AuthService {
     return response.refreshToken ?? null;
   }
 
+  private extractLastFirma(response: LoginResponse): LastFirma | null {
+    if (typeof response === 'string') {
+      return null;
+    }
+
+    return this.normalizeLastFirma(response.lastFirma);
+  }
+
   private extractUserType(response: LoginResponse): UserRoleCode | null {
     if (typeof response === 'string') {
       return null;
@@ -287,6 +312,7 @@ export class AuthService {
     this.clearAccessToken();
     this.clearUserType();
     this.clearUserDisplayName();
+    this.clearLastFirma();
     this.clearRefreshToken();
   }
 
@@ -315,6 +341,26 @@ export class AuthService {
 
   private clearRefreshToken(): void {
     this.storeRefreshToken(null);
+  }
+
+  // memorizza l'ultimo stato di firma in memoria e nel localStorage
+  private storeLastFirma(value: LastFirma | null): void {
+    this.inMemoryLastFirma = value;
+    const storage = this.getStorage();
+    if (!storage) {
+      return;
+    }
+
+    if (value === null) {
+      storage.removeItem(this.lastFirmaStorageKey);
+      return;
+    }
+
+    storage.setItem(this.lastFirmaStorageKey, JSON.stringify(value));
+  }
+
+  private clearLastFirma(): void {
+    this.storeLastFirma(null);
   }
 
   // memorizza il tipo utente in memoria e nel localStorage
@@ -371,6 +417,29 @@ export class AuthService {
     return normalized;
   }
 
+  // recupera l'ultimo stato di firma memorizzato
+  private getStoredLastFirma(): LastFirma | null {
+    if (this.inMemoryLastFirma !== undefined) {
+      return this.inMemoryLastFirma;
+    }
+
+    const stored = this.getStorage()?.getItem(this.lastFirmaStorageKey);
+    if (!stored) {
+      this.inMemoryLastFirma = null;
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(stored);
+      const normalized = this.normalizeLastFirma(parsed);
+      this.inMemoryLastFirma = normalized;
+      return normalized;
+    } catch {
+      this.inMemoryLastFirma = null;
+      return null;
+    }
+  }
+
   // recupera il tipo utente memorizzato
   private getStoredUserType(): UserRoleCode | null {
     if (this.inMemoryRoleType !== undefined) {
@@ -398,6 +467,13 @@ export class AuthService {
     return trimmed ? trimmed : null;
   }
 
+  private normalizeLastFirma(value: unknown): LastFirma | null {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    return value as LastFirma;
+  }
 
   private buildFullName(name: string | null, surname: string | null): string | null {
     if (name && surname) {
