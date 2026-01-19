@@ -15,7 +15,7 @@ interface LoginUser {
   email?: string;
 }
 
-type LoginResponse =
+type  LoginResponse =
   | {
       token?: string;
       jwt?: string;
