@@ -32,8 +32,8 @@ export class UtenteComponent implements OnInit, OnDestroy {
   private timerId?: any;
   isEntrata = true;
   isFirmaSubmitting = false;
-  private readonly firmaEntryUrl = '/api/Firma/Entry';
-  private readonly firmaExitUrl = '/api/Firma/Exit';
+  private readonly firmaEntryUrl = '/api/v1/Firma/Entry';
+  private readonly firmaExitUrl = '/api/v1/Firma/Exit';
   utenteContainer = "utente-container";
 
   // INIZIALIZZA IL COMPONENTE, IMPOSTA IL RUOLO DELL'UTENTE E AVVIA IL TIMER PER L'OROLOGIO

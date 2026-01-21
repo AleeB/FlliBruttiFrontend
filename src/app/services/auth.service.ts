@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 
 interface LoginRequest {
@@ -9,25 +9,28 @@ interface LoginRequest {
 }
 
 interface LoginUser {
+  idPerson?: number;
   type?: number | string;
   name?: string;
   surname?: string;
   email?: string;
+  dob?: string;
 }
 
 type LastFirma = Record<string, unknown>;
 
-type LoginResponse =
-  | {
-      token?: string;
-      jwt?: string;
-      accessToken?: string;
-      refreshToken?: string;
-      lastFirma?: LastFirma | null;
-      type?: number | string;
-      user?: LoginUser;
-    }
-  | string;
+interface LoginResponseObject {
+  message?: string;
+  token?: string;
+  jwt?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  lastFirma?: LastFirma | null;
+  type?: number | string;
+  user?: LoginUser;
+}
+
+type LoginResponse = LoginResponseObject | string;
 
 interface JwtPayload {
   exp?: number;
@@ -50,24 +53,26 @@ export class AuthService {
   private readonly roleStorageKey = 'userType';
   private readonly displayNameStorageKey = 'userDisplayName';
   private readonly lastFirmaStorageKey = 'lastFirma';
-  private readonly loginUrl = '/api/Login';
-  private readonly refreshUrl = '/api/Login/refresh';
-  private readonly logoutUrl = '/api/Login/Logout';
+  private readonly sessionStorageKey = 'sessionActive';
+  private readonly loginUrl = '/api/v1/Login';
+  private readonly refreshUrl = '/api/v1/Login/refresh';
+  private readonly logoutUrl = '/api/v1/Login/logout';
   private inMemoryToken: string | null = null;
   private inMemoryRefreshToken?: string | null;
   private inMemoryRoleType?: UserRoleCode | null;
   private inMemoryDisplayName?: string | null;
   private inMemoryLastFirma?: LastFirma | null;
-  private authState$ = new BehaviorSubject<boolean>(this.hasValidToken());
+  private inMemorySessionActive?: boolean;
+  private authState$ = new BehaviorSubject<boolean>(this.hasValidSession());
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<string> {
+  login(email: string, password: string): Observable<string | null> {
     const payload: LoginRequest = { email, password };
 
     return this.http.post<LoginResponse>(this.loginUrl, payload).pipe(
       map((response) => {
-        const token = this.extractToken(response);
+        const token = this.extractToken(response, true);
         const roleType = this.extractUserType(response);
         const displayName = this.extractUserDisplayName(response);
         const refreshToken = this.extractRefreshToken(response);
@@ -76,9 +81,14 @@ export class AuthService {
         this.storeUserDisplayName(displayName);
         this.storeRefreshToken(refreshToken);
         this.storeLastFirma(lastFirma);
+        if (token) {
+          this.storeToken(token);
+          this.clearSessionActive();
+        } else {
+          this.storeSessionActive(true);
+        }
         return token;
       }),
-      tap((token) => this.storeToken(token)),
       catchError((err) => throwError(() => this.normalizeLoginError(err)))
     );
   }
@@ -117,7 +127,7 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return this.hasValidToken();
+    return this.hasValidSession();
   }
 
   authStateChanges(): Observable<boolean> {
@@ -230,18 +240,20 @@ export class AuthService {
     return parsedRole ?? UserRoleCode.Employee;
   }
 
-  private extractToken(response: LoginResponse): string {
+  private extractToken(response: LoginResponse): string;
+  private extractToken(response: LoginResponse, allowEmpty: true): string | null;
+  private extractToken(response: LoginResponse, allowEmpty = false): string | null {
     if (typeof response === 'string') {
       return response;
     }
 
     // Try multiple possible token fields
     const token = response.token ?? response.jwt ?? response.accessToken;
-    if (!token) {
+    if (!token && !allowEmpty) {
       throw new Error('Token non presente nella risposta di login.');
     }
 
-    return token;
+    return token ?? null;
   }
 
   private extractRefreshToken(response: LoginResponse): string | null {
@@ -304,11 +316,12 @@ export class AuthService {
   private storeToken(token: string): void {
     this.inMemoryToken = token;
     this.getStorage()?.setItem(this.tokenStorageKey, token);
-    this.authState$.next(true);
+    this.updateAuthState();
   }
 
   // rimuove il token e le informazioni utente memorizzate
   private clearToken(): void {
+    this.clearSessionActive();
     this.clearAccessToken();
     this.clearUserType();
     this.clearUserDisplayName();
@@ -320,7 +333,7 @@ export class AuthService {
   private clearAccessToken(): void {
     this.inMemoryToken = null;
     this.getStorage()?.removeItem(this.tokenStorageKey);
-    this.authState$.next(false);
+    this.updateAuthState();
   }
 
   // memorizza il refresh token in memoria e nel localStorage
@@ -456,6 +469,27 @@ export class AuthService {
     return typeof localStorage === 'undefined' ? null : localStorage;
   }
 
+  private storeSessionActive(active: boolean): void {
+    this.inMemorySessionActive = active;
+    const storage = this.getStorage();
+    if (!storage) {
+      this.updateAuthState();
+      return;
+    }
+
+    if (!active) {
+      storage.removeItem(this.sessionStorageKey);
+    } else {
+      storage.setItem(this.sessionStorageKey, 'true');
+    }
+
+    this.updateAuthState();
+  }
+
+  private clearSessionActive(): void {
+    this.storeSessionActive(false);
+  }
+
   // normalizza una parte del nome, restituendo null se non valida
   // la normalizzo perché forse arriva vuota o con spazi
   private normalizeNamePart(value: unknown): string | null {
@@ -483,6 +517,10 @@ export class AuthService {
     return name || surname || null;
   }
 
+  private hasValidSession(): boolean {
+    return this.hasValidToken() || this.hasStoredSession();
+  }
+
   private hasValidToken(): boolean {
     const token = this.inMemoryToken ?? this.getStorage()?.getItem(this.tokenStorageKey);
     if (!token) {
@@ -490,6 +528,21 @@ export class AuthService {
     }
 
     return !this.isTokenExpired(token);
+  }
+
+  private hasStoredSession(): boolean {
+    if (this.inMemorySessionActive !== undefined) {
+      return this.inMemorySessionActive;
+    }
+
+    const stored = this.getStorage()?.getItem(this.sessionStorageKey);
+    const active = stored === 'true';
+    this.inMemorySessionActive = active;
+    return active;
+  }
+
+  private updateAuthState(): void {
+    this.authState$.next(this.hasValidSession());
   }
 
   // verifica se il token JWT è scaduto

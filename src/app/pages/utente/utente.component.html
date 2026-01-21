@@ -14,7 +14,7 @@
         <div class="firma-section">
             <p class="firma-time">{{ oraFirma | date: 'd MMM y' : 'UTC+1' }}</p>
             <button class="firma-btn" (click)="toggleFirma()">
-                {{ isEntrata ? 'FIRMA ENTRATA' : 'FIRMA USCITA' }}
+                {{ isEntrata ? 'FIRMA USCITA' : 'FIRMA ENTRATA' }}
             </button>
             <p class="firma-time min">{{ oraFirma | date: 'HH:mm' }}</p>
         </div>
