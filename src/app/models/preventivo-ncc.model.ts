@@ -5,7 +5,7 @@ export interface PreventivoNccPayload {
   userNonAutenticato: {
     name: string;
     surname: string;
-    phone: string;
+    phoneNumber: string;
     ip: string;
     email: string;
   };

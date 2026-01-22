@@ -14,7 +14,7 @@ interface LoginUser {
   name?: string;
   surname?: string;
   email?: string;
-  dob?: string;
+  phoneNumber?: string;
 }
 
 type LastFirma = Record<string, unknown>;

@@ -90,7 +90,7 @@ export class NccQuoteStoreService {
       userNonAutenticato: {
         name: this.normalizeValue(this.draft.nome),
         surname: this.normalizeValue(this.draft.cognome),
-        phone: this.normalizeValue(this.draft.telefono),
+        phoneNumber: this.normalizeValue(this.draft.telefono),
         ip: this.normalizeValue(ip),
         email: this.normalizeValue(this.draft.mail)
       }
