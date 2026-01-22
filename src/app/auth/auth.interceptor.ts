@@ -5,10 +5,11 @@ import { catchError, switchMap, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const isAuthRequest =
-    req.url.endsWith('/api/Login') ||
-    req.url.endsWith('/api/Login/refresh') ||
-    req.url.endsWith('/api/Login/Logout');
+  const isAuthRequest = [
+    '/api/v1/Login',
+    '/api/v1/Login/refresh',
+    '/api/v1/Login/logout'
+  ].some((path) => req.url.endsWith(path));
   const token = authService.getToken();
 
   const authRequest =

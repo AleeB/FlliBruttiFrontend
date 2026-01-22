@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { PreventivoNccPayload } from '../models/preventivo-ncc.model';
 
 export interface NccQuoteDraft {
   periodStart?: string;
@@ -71,6 +72,35 @@ export class NccQuoteStoreService {
     ].join('\n');
   }
 
+  buildBackendPayload(ip?: string): PreventivoNccPayload {
+    const periodLabel = this.formatPeriodForPayload();
+    const details = this.normalizeValue(this.draft.dettagli);
+    const descriptionParts = [];
+    if (periodLabel) {
+      descriptionParts.push(`Periodo: ${periodLabel}`);
+    }
+    if (details) {
+      descriptionParts.push(`Dettagli: ${details}`);
+    }
+
+    return {
+      description: descriptionParts.join('\n'),
+      partenza: this.normalizeValue(this.draft.cittaPartenza),
+      arrivo: this.normalizeValue(this.draft.cittaArrivo),
+      userNonAutenticato: {
+        name: this.normalizeValue(this.draft.nome),
+        surname: this.normalizeValue(this.draft.cognome),
+        phone: this.normalizeValue(this.draft.telefono),
+        ip: this.normalizeValue(ip),
+        email: this.normalizeValue(this.draft.mail)
+      }
+    };
+  }
+
+  private normalizeValue(value?: string): string {
+    return value?.trim() ?? '';
+  }
+
   private formatValue(value?: string): string {
     const trimmed = value?.trim();
     return trimmed ? trimmed : '-';
@@ -93,6 +123,30 @@ export class NccQuoteStoreService {
 
   private pad2(value: number): string {
     return value < 10 ? `0${value}` : `${value}`;
+  }
+
+  private formatPeriodForPayload(): string {
+    const start = this.formatDateForPayload(this.draft.periodStart);
+    const end = this.formatDateForPayload(this.draft.periodEnd);
+    if (!start || !end) {
+      return '';
+    }
+    return `${start} - ${end}`;
+  }
+
+  private formatDateForPayload(value?: string): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    const day = this.pad2(date.getDate());
+    const month = this.pad2(date.getMonth() + 1);
+    return `${day}/${month}/${date.getFullYear()}`;
   }
 
   private load(): NccQuoteDraft {

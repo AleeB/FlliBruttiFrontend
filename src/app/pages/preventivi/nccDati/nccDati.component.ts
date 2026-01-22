@@ -11,7 +11,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { AutoFocus } from "primeng/autofocus";
 import { MessageService } from 'primeng/api';
 import { Toast } from "primeng/toast";
-import { finalize, timer } from 'rxjs';
+import { finalize, forkJoin, timer } from 'rxjs';
 import { QuoteEmailPayload, QuoteService } from '../../../services/quote.service';
 import { NccQuoteStoreService } from '../../../services/ncc-quote-store.service';
 
@@ -75,10 +75,13 @@ export class NccDatiComponent implements OnInit {
       subject: 'Richiesta preventivo NCC',
       body: this.nccStore.buildSummary()
     };
+    const backendPayload = this.nccStore.buildBackendPayload(this.resolveClientIp());
 
     this.isSubmitting = true;
-    this.quoteService
-      .sendByEmail(payload)
+    forkJoin([
+      this.quoteService.sendByEmail(payload),
+      this.quoteService.sendNccPreventivo(backendPayload)
+    ])
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: () => {
@@ -101,5 +104,13 @@ export class NccDatiComponent implements OnInit {
           });
         }
       });
+  }
+
+  private resolveClientIp(): string {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+
+    return window.location.hostname ?? '';
   }
 }

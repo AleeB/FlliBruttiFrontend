@@ -95,15 +95,12 @@ export class AuthService {
 
   logout(): void {
     const refreshToken = this.getRefreshToken();
-    this.clearToken();
-    if (!refreshToken) {
-      return;
-    }
-
+    const payload = refreshToken ? { refreshToken } : {};
     this.http
-      .post<void>(this.logoutUrl, { refreshToken })
+      .post<void>(this.logoutUrl, payload)
       .pipe(catchError(() => of(void 0)))
       .subscribe();
+    this.clearToken();
   }
 
   refreshAccessToken(): Observable<string> {
