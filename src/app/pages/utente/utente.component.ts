@@ -1,11 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { TimeTableService } from '../../services/timeTable.service';
 import { AuthService, UserRoleCode } from '../../services/auth.service';
 import { finalize } from 'rxjs';
-
 
 
 @Component({
@@ -15,17 +14,17 @@ import { finalize } from 'rxjs';
   templateUrl: './utente.component.html',
   styleUrl: './utente.component.scss',
 })
-
 export class UtenteComponent implements OnInit, OnDestroy {
-  
 
   constructor(
     public authService: AuthService,
     public timeTableService: TimeTableService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
   
-  // nome utente simulato, da sostituire con dati passati dal backend
+    // nome utente simulato, da sostituire con dati passati dal backend
+
   nomeUtente: string = 'Mario Rossi'; 
   isAdmin = false;
   oraFirma: Date = new Date();
@@ -36,7 +35,7 @@ export class UtenteComponent implements OnInit, OnDestroy {
   private readonly firmaExitUrl = '/api/v1/Firma/Exit';
   utenteContainer = "utente-container";
 
-  // INIZIALIZZA IL COMPONENTE, IMPOSTA IL RUOLO DELL'UTENTE E AVVIA IL TIMER PER L'OROLOGIO
+   // INIZIALIZZA IL COMPONENTE, IMPOSTA IL RUOLO DELL'UTENTE E AVVIA IL TIMER PER L'OROLOGIO
   // 1 = admin, 2 = employee
   ngOnInit(): void { 
     this.isAdmin = this.authService.roleCode() === UserRoleCode.Admin;
@@ -44,15 +43,18 @@ export class UtenteComponent implements OnInit, OnDestroy {
     if (identity) {
       this.nomeUtente = identity;
     }
+    
     this.syncFirmaStateFromLastFirma();
+    
     this.oraFirma = new Date();
     this.timerId = setInterval(() => {
-      this.oraFirma = new Date();
+      this.oraFirma = new Date();      
       console.log('Aggiornamento orario firma:', this.oraFirma);
+
     }, 1000);
   }
 
-  onInput(e : any): void {
+  onInput(e: any): void {
     const q = e?.target?.value ?? '';
     this.timeTableService.filterByName(q);
   }
@@ -70,22 +72,28 @@ export class UtenteComponent implements OnInit, OnDestroy {
 
     const url = this.isEntrata ? this.firmaEntryUrl : this.firmaExitUrl;
     this.isFirmaSubmitting = true;
+    
     this.http
       .post<unknown>(url, null)
-      .pipe(finalize(() => (this.isFirmaSubmitting = false)))
+      .pipe(finalize(() => {
+        this.isFirmaSubmitting = false;
+        this.cdr.detectChanges();
+      }))
       .subscribe({
         next: (response) => {
           const lastFirma = this.extractLastFirma(response);
+          
           if (lastFirma) {
             this.authService.updateLastFirma(lastFirma);
             this.isEntrata = !this.shouldShowExit(lastFirma);
-            return;
+          } else {
+            this.isEntrata = !this.isEntrata;
           }
-
-          this.isEntrata = !this.isEntrata;
+          
+          this.cdr.detectChanges();
         },
         error: () => {
-          // ignora: lo stato rimane invariato se la firma fallisce
+          // Stato rimane invariato se la firma fallisce
         }
       });
   }
@@ -95,13 +103,23 @@ export class UtenteComponent implements OnInit, OnDestroy {
     this.isEntrata = !this.shouldShowExit(lastFirma);
   }
 
+  
+  //Determina se mostrare "FIRMA USCITA":
+  // null false mostra ENTRATA
+  //entrata presente, uscita null/vuota → true (mostra USCITA)
+  //entrambi presenti → false (mostra ENTRATA)
+
   private shouldShowExit(lastFirma: Record<string, unknown> | null): boolean {
     if (!lastFirma) {
       return false;
     }
 
+    const entrata = lastFirma['entrata'];
     const uscita = lastFirma['uscita'];
-    return !this.hasFirmaValue(uscita);
+    const hasEntrata = this.hasFirmaValue(entrata);
+    const hasUscita = this.hasFirmaValue(uscita);
+    
+    return hasEntrata && !hasUscita;
   }
 
   private hasFirmaValue(value: unknown): boolean {
@@ -135,7 +153,7 @@ export class UtenteComponent implements OnInit, OnDestroy {
   }
 
   scaricaOrari(): void {
-    // Simulazione del download dei dati
+     // Simulazione del download dei dati
     // Da implementare con funzionalità reali
     alert('Scaricando i dati...');
   }

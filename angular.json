@@ -75,6 +75,12 @@
             },
             "development": {
               "buildTarget": "FE:build:development"
+            },
+            "https": {
+              "buildTarget": "FE:build:development",
+              "ssl": true,
+              "sslKey": "certs/localhost-key.pem",
+              "sslCert": "certs/localhost.pem"
             }
           },
           "defaultConfiguration": "development"
