@@ -1,6 +1,6 @@
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY FlliBruttiFrontend/package*.json ./
+COPY FlliBruttiFrontend/package.json FlliBruttiFrontend/package-lock.json ./
 RUN npm install
 COPY FlliBruttiFrontend/ ./
 RUN npm run build
