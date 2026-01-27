@@ -4,8 +4,6 @@ Queste istruzioni permettono di avviare il progetto in locale usando Docker (con
 
 ## Prerequisiti
 - Docker Desktop con Docker Compose v2
-- (Opzionale) Node.js 20 + npm 10 per sviluppo frontend
-- (Opzionale) .NET 8 SDK per sviluppo backend
 
 ## Deploy locale con Docker
 
@@ -23,8 +21,8 @@ docker network create app-net
 cd FlliBruttiBackend\FlliBruttiBackend\backend
 ```
 
-Inserire il file `.env` ottenuto via Email dentro .\FlliBruttiBackend\backend
-```
+Inserire il file `.env` ottenuto via Email dentro .\FlliBruttiBackend\frontend
+
 
 Avvia i container:
 
@@ -56,6 +54,9 @@ docker compose up -d
 
 ### 5) Stop e cleanup
 Esegui `docker compose down` nella cartella backend e nella root del progetto.
+Esegui `docker compose down -v` per cancellare i volumi, nella cartella backend e nella root del progetto.
+
+### NB) Le pipeline CI / CD sono nella cartella .github/workflows nella repo del progetto.
 
 ## Modalita sviluppo (opzionale)
 
@@ -65,8 +66,6 @@ cd FlliBruttiFrontend
 npm ci
 npm start
 ```
-
-Nota: il proxy di sviluppo punta a `https://localhost:7115` (vedi `FlliBruttiFrontend\proxy.conf.json`).
 
 ### Backend
 ```powershell
@@ -80,3 +79,6 @@ dotnet run --project FlliBrutti.Backend.API --launch-profile https
 ## Note
 - Il database viene inizializzato dagli script in `FlliBruttiBackend\FlliBruttiBackend\backend\init-db`.
 - Le porte possono essere cambiate nei rispettivi `docker-compose.yml`.
+
+
+
