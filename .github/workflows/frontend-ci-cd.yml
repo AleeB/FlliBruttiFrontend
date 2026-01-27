@@ -24,7 +24,6 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/fllibrutti-frontend
   FRONTEND_DIR: FlliBruttiFrontend
   NODE_VERSION: 20
 
@@ -47,18 +46,23 @@ jobs:
         run: npm run build
       
 
-  docker:   #cd
+  docker:
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Set image name lowercase
+        run: echo "IMAGE_NAME=$(echo ${{ github.repository_owner }}/fllibrutti-frontend | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      
       - name: Login to registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
