@@ -1,0 +1,70 @@
+name: frontend-ci-cd
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "FlliBruttiFrontend/**"
+      - "nginx/**"
+      - "dockerfile"
+      - "docker-compose.yml"
+      - ".github/workflows/frontend-ci-cd.yml"
+  pull_request:
+    paths:
+      - "FlliBruttiFrontend/**"
+      - "nginx/**"
+      - "dockerfile"
+      - "docker-compose.yml"
+      - ".github/workflows/frontend-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/fllibrutti-frontend
+  FRONTEND_DIR: FlliBruttiFrontend
+  NODE_VERSION: 20
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.FRONTEND_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      
+
+  docker:
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
