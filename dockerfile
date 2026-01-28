@@ -9,5 +9,5 @@ RUN npm run build
 
 # serve con Nginx
 FROM nginx:1.27-alpine
-COPY --from=build /app/dist/FE/browser/ /usr/share/nginx/html/
+COPY --from=build /app/dist/FE/browser/* /usr/share/nginx/html/
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
