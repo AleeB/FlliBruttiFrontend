@@ -5,14 +5,14 @@ on:
     branches: [main]
     paths:
       - "FlliBruttiFrontend/**"
-      - "nginx/**"
+      - "nginx/default.prod.conf"
       - "dockerfile"
       - "docker-compose.yml"
       - ".github/workflows/frontend-ci-cd.yml"
   pull_request:
     paths:
       - "FlliBruttiFrontend/**"
-      - "nginx/**"
+      - "nginx/default.prod.conf"
       - "dockerfile"
       - "docker-compose.yml"
       - ".github/workflows/frontend-ci-cd.yml"
