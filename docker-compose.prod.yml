@@ -1,0 +1,19 @@
+# ============================================
+# DOCKER COMPOSE - FRONTEND (GHCR)
+# ============================================
+
+version: '3.8'
+
+services:
+  frontend:
+    image: ${REGISTRY:-ghcr.io}/${REPO_OWNER}/${IMAGE_NAME}:${TAG:-latest}
+    container_name: ${CONTAINER_NAME}
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    networks:
+      - app-net
+    restart: unless-stopped
+
+networks:
+  app-net:
+    external: true

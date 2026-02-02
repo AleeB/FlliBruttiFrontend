@@ -7,14 +7,14 @@ on:
       - "FlliBruttiFrontend/**"
       - "nginx/default.prod.conf"
       - "dockerfile"
-      - "docker-compose.yml"
+      - "docker-compose.prod.yml"
       - ".github/workflows/frontend-ci-cd.yml"
   pull_request:
     paths:
       - "FlliBruttiFrontend/**"
       - "nginx/default.prod.conf"
       - "dockerfile"
-      - "docker-compose.yml"
+      - "docker-compose.prod.yml"
       - ".github/workflows/frontend-ci-cd.yml"
   workflow_dispatch:
 
